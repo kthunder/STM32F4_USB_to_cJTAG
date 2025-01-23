@@ -1,0 +1,80 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "launch",
+            "cwd": "${workspaceFolder}",
+            "executable": "./build/${workspaceFolderBasename}.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "servertype": "openocd",
+            "gdbPath": "arm-none-eabi-gdb.exe",
+            "configFiles": [
+                "interface/cmsis-dap.cfg",
+                // "interface/stlink-v2-1.cfg",
+                // "interface/jlink.cfg",
+                // "./.vscode/interface.cfg",
+                "target/stm32f4x.cfg",
+            ],
+            "liveWatch": {
+                "enabled": false,
+                "samplesPerSecond": 4
+            },
+            "preLaunchTask": "Build",
+            "rttConfig": {
+                "enabled": true,
+                "searchId": "SEGGER RTT",
+                "address": "536871312",
+                "searchSize": 2000,
+                "rtt_start_retry": 1000,
+                "decoders": [
+                    {
+                        "label": "",
+                        "port": 0,
+                        "type": "console"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "attach",
+            "cwd": "${workspaceFolder}",
+            "executable": "./build/${workspaceFolderBasename}.elf",
+            "request": "attach",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "servertype": "openocd",
+            "gdbPath": "arm-none-eabi-gdb.exe",
+            "configFiles": [
+                "interface/cmsis-dap.cfg",
+                // "interface/stlink-v2-1.cfg",
+                // "interface/jlink.cfg",
+                // "./.vscode/interface.cfg",
+                "target/stm32f4x.cfg",
+            ],
+            // "svdFile": ".env/STM32F401.svd",
+            "liveWatch": {
+                "enabled": false,
+                "samplesPerSecond": 4
+            },
+            "rttConfig": {
+                "enabled": true,
+                "searchId": "SEGGER RTT",
+                "address": "536870912",
+                "searchSize": 2000,
+                "rtt_start_retry": 1000,
+                "decoders": [
+                    {
+                        "label": "",
+                        "port": 0,
+                        "type": "console"
+                    }
+                ]
+            }
+        },
+    ]
+}

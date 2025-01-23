@@ -1,0 +1,15 @@
+# IDE
+# .vscode/
+.idea/
+.cache/
+build/
+deps/
+test/test.*
+compile_commands.json
+
+# BIN
+*.[oa]
+*.exe
+*.out
+*.elf
+*.log
