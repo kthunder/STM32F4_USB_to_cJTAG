@@ -221,43 +221,12 @@ static void MX_USB_OTG_FS_PCD_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, TCKC_Pin|TMSC_Pin|W25Q64_CHIP_SELECT_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : TCKC_Pin */
-  GPIO_InitStruct.Pin = TCKC_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(TCKC_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : TMSC_Pin */
-  GPIO_InitStruct.Pin = TMSC_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(TMSC_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : TDO_Pin */
-  GPIO_InitStruct.Pin = TDO_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(TDO_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : W25Q64_CHIP_SELECT_Pin */
-  GPIO_InitStruct.Pin = W25Q64_CHIP_SELECT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(W25Q64_CHIP_SELECT_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

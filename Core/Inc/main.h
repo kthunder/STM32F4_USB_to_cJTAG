@@ -59,14 +59,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TCKC_Pin GPIO_PIN_1
-#define TCKC_GPIO_Port GPIOA
-#define TMSC_Pin GPIO_PIN_2
-#define TMSC_GPIO_Port GPIOA
-#define TDO_Pin GPIO_PIN_3
-#define TDO_GPIO_Port GPIOA
-#define W25Q64_CHIP_SELECT_Pin GPIO_PIN_4
-#define W25Q64_CHIP_SELECT_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
