@@ -5,6 +5,8 @@
  */
  #ifndef CHERRYUSB_CONFIG_H
  #define CHERRYUSB_CONFIG_H
+
+ #include "usb_dcache.h"
  
  /* ================ USB common Configuration ================ */
  
