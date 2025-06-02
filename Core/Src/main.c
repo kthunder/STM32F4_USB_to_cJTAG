@@ -22,7 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "SEGGER_RTT.h"
-#include "cdc_acm_template.c"
+#include "winusb1.0_template.c"
 #include "log.h"
 #include <stdbool.h>
 
@@ -128,8 +128,7 @@ int main(void)
   // log_info("SWD Disabled!");
   // cJtag_active(); 
   // test();
-  cdc_acm_init(0, USB_OTG_FS_PERIPH_BASE);
-  usbd_cdc_acm_set_dtr(0,0,1);
+  winusb_init(0, USB_OTG_FS);
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
@@ -137,7 +136,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) {
     // extern void cdc_acm_data_send_with_dtr_test(uint8_t busid);
-    cdc_acm_data_send_with_dtr_test(0);
+    // cdc_acm_data_send_with_dtr_test(0);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
