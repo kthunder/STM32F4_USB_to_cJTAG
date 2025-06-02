@@ -16,7 +16,6 @@ target_include_directories(app INTERFACE
 
 target_sources(app INTERFACE
     ../../Core/RTT/log.c
-    ../../Core/RTT/openocd_tool.c
     ../../Core/RTT/SEGGER_RTT.c
     ../../Core/RTT/SEGGER_RTT_ASM_ARMv7M.s
     ../../Core/Src/cJTAG.c

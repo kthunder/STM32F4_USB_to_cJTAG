@@ -26,8 +26,6 @@
 #include "log.h"
 #include <stdbool.h>
 
-
-// #include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -287,13 +285,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-/**
- * @brief GPIO Initialization Function
- * @param None
- * @retval None
- */
-// static void MX_GPIO_Init_ex(void) {
-
 /* USER CODE END 4 */
 
 /**

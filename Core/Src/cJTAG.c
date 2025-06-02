@@ -3,8 +3,6 @@
 #include <stdbool.h>
 #include "main.h"
 #include "log.h"
-#include "openocd_tool.h"
-// #include "driver/gpio.h"
 /*******************************SQE*******************************/
 /*------------------------PIN OPERATION PORTING----------------------------------*/
 // clang-format off
