@@ -21,10 +21,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "SEGGER_RTT.h"
+#include "cdc_acm_template.c"
 #include "log.h"
 #include <stdbool.h>
-#include "SEGGER_RTT.h"
-#include "usbd_cdc_if.h"
+
+
+// #include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,6 +46,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
+
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
@@ -54,24 +59,25 @@ extern uint16_t myUsbRxNum;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-static void MX_GPIO_Init_ex(void);
-extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO, uint32_t bits);
-extern void cJtag_active();
-extern int test(void);
+// static void MX_GPIO_Init_ex(void);
+// extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
+//                            uint32_t bits);
+// extern void cJtag_active();
+// extern int test(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // commom functions
-int __io_getchar(FILE *file)
-{
+int __io_getchar(FILE *file) {
   (void)file;
   // USART_Receive(USART1, &ch, 1);// un support
   return 0;
 }
-int __io_putchar(char ch, FILE *file)
-{
+int __io_putchar(char ch, FILE *file) {
+  // (void)ch;
   (void)file;
   HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
   // SEGGER_RTT_PutChar(0, ch);
@@ -79,9 +85,9 @@ int __io_putchar(char ch, FILE *file)
   return 1;
 }
 
-uint8_t buff[64] = {0};
-command *curr_cmd = (command *)buff;
-osMessageQueueId_t cmd_queue = NULL;
+// uint8_t buff[64] = {0};
+// command *curr_cmd = (command *)buff;
+// osMessageQueueId_t cmd_queue = NULL;
 /* USER CODE END 0 */
 
 /**
@@ -113,20 +119,25 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USB_OTG_FS_PCD_Init();
+  // MX_USB_OTG_FS_PCD_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_Delay(5000);
-  MX_GPIO_Init_ex();
-  log_set_level(LOG_DEBUG);
-  log_info("SWD Disabled!");
-  cJtag_active();
-  test();
+  // HAL_Delay(5000);
+  // MX_GPIO_Init_ex();
+  // log_set_level(LOG_DEBUG);
+  // log_info("SWD Disabled!");
+  // cJtag_active(); 
+  // test();
+  cdc_acm_init(0, USB_OTG_FS_PERIPH_BASE);
+  usbd_cdc_acm_set_dtr(0,0,1);
+  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1) {
+    // extern void cdc_acm_data_send_with_dtr_test(uint8_t busid);
+    cdc_acm_data_send_with_dtr_test(0);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -180,6 +191,39 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief USB_OTG_FS Initialization Function
   * @param None
   * @retval None
@@ -221,6 +265,7 @@ static void MX_USB_OTG_FS_PCD_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
@@ -228,45 +273,28 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, TCKC_Pin|TMSC_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : TCKC_Pin TMSC_Pin */
+  GPIO_InitStruct.Pin = TCKC_Pin|TMSC_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
- static void MX_GPIO_Init_ex(void)
- {
-   GPIO_InitTypeDef GPIO_InitStruct = {0};
- /* USER CODE BEGIN MX_GPIO_Init_1 */
- /* USER CODE END MX_GPIO_Init_1 */
- 
-   /* GPIO Ports Clock Enable */
-   __HAL_RCC_GPIOA_CLK_ENABLE();
- 
-   /*Configure GPIO pin Output Level */
-   HAL_GPIO_WritePin(GPIOA, TCKC_Pin|TMSC_Pin, GPIO_PIN_RESET);
- 
-   /*Configure GPIO pin : TCKC_Pin */
-   GPIO_InitStruct.Pin = TCKC_Pin;
-   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-   GPIO_InitStruct.Pull = GPIO_PULLUP;
-   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-   HAL_GPIO_Init(TCKC_GPIO_Port, &GPIO_InitStruct);
- 
-   /*Configure GPIO pin : TMSC_Pin */
-   GPIO_InitStruct.Pin = TMSC_Pin;
-   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-   GPIO_InitStruct.Pull = GPIO_PULLUP;
-   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-   HAL_GPIO_Init(TMSC_GPIO_Port, &GPIO_InitStruct);
- 
- /* USER CODE BEGIN MX_GPIO_Init_2 */
- /* USER CODE END MX_GPIO_Init_2 */
- }
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+// static void MX_GPIO_Init_ex(void) {
+
 /* USER CODE END 4 */
 
 /**
@@ -278,8 +306,7 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
-  while (1)
-  {
+  while (1) {
   }
   /* USER CODE END Error_Handler_Debug */
 }
@@ -295,7 +322,8 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
+  /* User can add his own implementation to report the file name and line
+     number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }

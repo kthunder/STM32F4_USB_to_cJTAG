@@ -7,5 +7,18 @@
         "compare": "cpp",
         "cmsis_os.h": "c"
     },
-    "cortex-debug.variableUseNaturalFormat": true
+    "cortex-debug.variableUseNaturalFormat": false,
+    "clangd.arguments": [
+        "-j=12",
+        "--background-index",
+        "--query-driver=C:/Users/Administrator/.pico-sdk/toolchain/14_2_Rel1/bin/arm-none-eabi-*", //设置交叉编译器路径
+        // "--query-driver=C:/APP/C-SKY/CDKRepo/Toolchain/XTGccElfNewlib/V2.10.0/R/bin/riscv64-unknown-elf-*", //设置交叉编译器路径
+        // "--query-driver=C:/msys64/mingw64/bin/arm-none-eabi-*", //设置交叉编译器路径
+        "--compile-commands-dir=${workspaceFolder}/build",
+        "--all-scopes-completion",
+        "--completion-style=detailed",
+        "--header-insertion=never",
+        "--clang-tidy",
+        "--log=verbose"
+    ]
 }

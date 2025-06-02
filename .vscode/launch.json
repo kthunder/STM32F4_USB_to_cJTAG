@@ -12,7 +12,7 @@
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "servertype": "openocd",
-            "gdbPath": "arm-none-eabi-gdb.exe",
+            "gdbPath": "C:/Users/Administrator/.pico-sdk/toolchain/14_2_Rel1/bin/arm-none-eabi-gdb.exe",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
                 // "interface/stlink-v2-1.cfg",
@@ -48,7 +48,7 @@
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "servertype": "openocd",
-            "gdbPath": "arm-none-eabi-gdb.exe",
+            "gdbPath": "C:/Users/Administrator/.pico-sdk/toolchain/14_2_Rel1/bin/arm-none-eabi-gdb.exe",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
                 // "interface/stlink-v2-1.cfg",
@@ -62,7 +62,7 @@
                 "samplesPerSecond": 4
             },
             "rttConfig": {
-                "enabled": true,
+                "enabled": false,
                 "searchId": "SEGGER RTT",
                 "address": "536870912",
                 "searchSize": 2000,

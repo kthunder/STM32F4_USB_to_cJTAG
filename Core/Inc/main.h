@@ -59,6 +59,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define TCKC_Pin GPIO_PIN_1
+#define TCKC_GPIO_Port GPIOA
+#define TMSC_Pin GPIO_PIN_2
+#define TMSC_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

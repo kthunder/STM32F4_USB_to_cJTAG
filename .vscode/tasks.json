@@ -12,7 +12,7 @@
         {
             "type": "shell",
             "label": "Build",
-            "command": "cmake -S . -B build -G 'Unix Makefiles' ; cmake --build build -j12",
+            "command": "cmake -S . -B build -G 'Ninja' ; cmake --build build -j12",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -32,7 +32,7 @@
             "type": "shell",
             "label": "Download",
             "dependsOn": "Build",
-            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c'program ./build/STM32F4.elf verify reset exit' ",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c'program ./build/STM32F4_USB_to_cJTAG.elf verify reset exit' ",
             "options": {
                 "cwd": "${workspaceFolder}"
             },

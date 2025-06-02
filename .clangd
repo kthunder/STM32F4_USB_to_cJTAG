@@ -1,0 +1,5 @@
+CompileFlags:
+  Remove: 
+  [
+    -fno-ipa-sra, -mno-thumb-interwork, -fno-var-tracking-assignments, -mno-single-pic-base, -fconserve-stack, -mcpu=e902m,-fstrict-volatile-bitfields
+  ]
