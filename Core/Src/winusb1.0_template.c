@@ -451,16 +451,18 @@ void usbd_winusb_out(uint8_t busid, uint8_t ep, uint32_t nbytes)
     // for (int i = 0; i < 100; i++) {
     //     printf("%c ", read_buffer[i]);
     // }
-    // printf("\r\n");
+    printf("--------------%s\r\n", __func__);
     chry_ringbuffer_write(&rb, read_buffer, nbytes);
-    usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, nbytes);
+    memset(read_buffer, 0xaa, 64);
+    usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, 64);
     /* setup next out ep read transfer */
-    usbd_ep_start_read(busid, WINUSB_OUT_EP, read_buffer, 2048);
+    usbd_ep_start_read(busid, WINUSB_OUT_EP, read_buffer, 64);
 }
 
 void usbd_winusb_in(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
     USB_LOG_RAW("actual in len:%d\r\n", (unsigned int)nbytes);
+    printf("--------------%s\r\n", __func__);
 
     if ((nbytes % WINUSB_EP_MPS) == 0 && nbytes) {
         /* send zlp */

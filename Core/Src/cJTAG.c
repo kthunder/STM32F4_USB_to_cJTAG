@@ -125,6 +125,39 @@ void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO, uint32_t bit
     // printf("\n");
 }
 
+void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO)
+{
+    bool tms, tdi, tdo;
+    uint8_t tmp = 0;
+    uint32_t cycle = (bits + 7) / 8;
+    uint32_t last_count = bits - (8 * (cycle - 1));
+    for (size_t i = 1; i <= cycle; i++)
+    {
+        tmp = 0;
+        for (size_t j = 0; j < (i == cycle ? last_count : 8); j++)
+        {
+            tms = ((i == cycle) && (j == (last_count-1)))? 1 : 0;
+            tdi = (*ucTDI >> j) & 1;
+            JTAG_CYCLE_TCK_FAST(tms, tdi, tdo);
+            // printf("%d ", tdo);
+            tmp |= tdo << j;
+        }
+        ucTDI++;
+        *ucTDO++ = tmp;
+    }
+    // printf("\n");
+}
+
+void cJTAG_tms(uint32_t bits, uint8_t* ucTMS)
+{
+    bool tms, tdo;
+    for (size_t i = 0; i < bits; i++) {
+        tms = (ucTMS[i/8] >> (i%8)) & 1;
+        JTAG_CYCLE_TCK_FAST(tms, 1, tdo);
+    }
+    (void)tdo;
+}
+
 void cJTAG_operation_ir_scan(uint8_t *ir_w, uint8_t *ir_r, uint32_t bits)
 {
     if (ir_w == NULL || bits == 0 || bits > 8)

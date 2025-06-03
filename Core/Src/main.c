@@ -32,6 +32,13 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 // ***用户***私有类型定义
+typedef struct
+{
+  uint8_t len;
+  uint8_t opcode;
+  uint16_t bits;
+  uint8_t data[];
+} command;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -63,10 +70,12 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 // ***用户***私有函数签名
-// extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
-//                            uint32_t bits);
-// extern void cJtag_active();
-// extern int test(void);
+extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
+                           uint32_t bits);
+extern void cJtag_active();
+extern void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO);
+extern void cJTAG_tms(uint32_t bits, uint8_t* ucTMS);
+extern int test(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -75,21 +84,63 @@ static void MX_USART1_UART_Init(void);
 // commom functions
 int __io_getchar(FILE *file) {
   (void)file;
-  // USART_Receive(USART1, &ch, 1);// un support
   return 0;
 }
+
 int __io_putchar(char ch, FILE *file) {
   // (void)ch;
   (void)file;
   HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
-  // SEGGER_RTT_PutChar(0, ch);
-  // ITM_SendChar(ch);
   return 1;
 }
 
-// uint8_t buff[64] = {0};
-// command *curr_cmd = (command *)buff;
+uint8_t buff[64] = {0};
+command *curr_cmd = (command *)buff;
 // osMessageQueueId_t cmd_queue = NULL;
+
+void cJtag_task(void) {
+  if (chry_ringbuffer_peek_byte(&rb, buff)) {
+    // printf("len %d\r\n", buff[0]);
+    if (buff[0] <= chry_ringbuffer_get_used(&rb)) {
+      chry_ringbuffer_read(&rb, buff, buff[0]);
+      // recive a cmd
+      static uint8_t count = 0;
+      // log_info("--cmd %d---", count++);
+      // log_info("cmd[%02X]bits[%d]", curr_cmd->opcode, curr_cmd->bits);
+      switch (curr_cmd->opcode) {
+      case 0:    // ir/dr scan
+      case 0x80: // ir/dr scan
+      {
+        uint8_t buffer[0x100] = {0};
+        // printf("curr_cmd->bits %d\r\n", curr_cmd->bits);
+        // printf("sequence %s", to_binary_string(*(uint32_t *)curr_cmd->data, curr_cmd->bits));
+        // cJTAG_seq(curr_cmd->bits, (uint8_t *)&curr_cmd->data[0], buffer); //
+        // to Run-Test/Idle usb_io_write(, buffer); for (size_t i = 0; i <
+        // (curr_cmd->bits + 7) / 8; i++)
+        // {
+        //     xQueueSendToBack(xQueue_cmd_res, &buffer[i], 0);
+        // }
+      } break;
+      case 1: // tms
+      {
+        // printf("curr_cmd->bits %d\r\n", curr_cmd->bits);
+        // printf("tms %s", to_binary_string(*(uint32_t *)curr_cmd->data, curr_cmd->bits));
+        // cJTAG_tms(curr_cmd->bits, (uint8_t *)&curr_cmd->data[0]);
+        // usb_io_write(1, &buffer);
+      } break;
+      case 0xFF:
+      {
+        cJtag_active();
+        // printf("active %s", to_binary_stri4ng(*(uint32_t *)curr_cmd->data, curr_cmd->bits));
+        break;
+      }
+      default:
+        break;
+      }
+    }
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -131,7 +182,6 @@ int main(void)
   // cJtag_active(); 
   // test();
   winusb_init(0, USB_OTG_FS);
-  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,11 +190,11 @@ int main(void)
     // ***用户***循环代码
     // extern void cdc_acm_data_send_with_dtr_test(uint8_t busid);
     // cdc_acm_data_send_with_dtr_test(0);
-    uint8_t len =  chry_ringbuffer_read(&rb, temp, 1000);
-    if (len) {
-      printf("hello %d\r\n", len);
-    }
-    HAL_Delay(10);
+    // uint8_t len =  chry_ringbuffer_read(&rb, temp, 1000);
+    // if (len) {
+    //   printf("hello %d\r\n", len);
+    // }
+    cJtag_task();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

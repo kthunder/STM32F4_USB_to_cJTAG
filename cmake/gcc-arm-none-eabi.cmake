@@ -8,7 +8,7 @@ set(CMAKE_CXX_COMPILER_ID GNU)
 
 # Some default GCC settings
 # arm-none-eabi- must be part of path environment
-set(TOOLCHAIN_PREFIX                C:/msys64/mingw64/bin/arm-none-eabi-)
+set(TOOLCHAIN_PREFIX                arm-none-eabi-)
 
 set(CMAKE_C_COMPILER                ${TOOLCHAIN_PREFIX}gcc.exe)
 set(CMAKE_ASM_COMPILER              ${CMAKE_C_COMPILER})
