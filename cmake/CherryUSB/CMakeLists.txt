@@ -18,6 +18,8 @@ target_include_directories(CherryUSB INTERFACE
     ../../libs/CherryUSB/class/msc
     ../../libs/CherryUSB/demo
     ../../libs/CherryUSB/port/dwc2
+
+    ../../libs/CherryRB
 )
 
 target_sources(CherryUSB INTERFACE
@@ -27,6 +29,8 @@ target_sources(CherryUSB INTERFACE
     ../../libs/CherryUSB/class/msc/usbd_msc.c
     ../../libs/CherryUSB/class/msc/usbd_msc.c
     ../../libs/CherryUSB/class/cdc/usbd_cdc_acm.c
+
+    ../../libs/CherryRB/chry_ringbuffer.c
 )
 
 target_link_directories(CherryUSB INTERFACE

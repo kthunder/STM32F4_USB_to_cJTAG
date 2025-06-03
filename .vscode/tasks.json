@@ -32,7 +32,7 @@
             "type": "shell",
             "label": "Download",
             "dependsOn": "Build",
-            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c'program ./build/STM32F4_USB_to_cJTAG.elf verify reset exit' ",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c'program ./build/cw2225_tool.elf verify reset exit' ",
             "options": {
                 "cwd": "${workspaceFolder}"
             },

@@ -19,6 +19,7 @@ target_sources(app INTERFACE
     ../../Core/RTT/SEGGER_RTT.c
     ../../Core/RTT/SEGGER_RTT_ASM_ARMv7M.s
     ../../Core/Src/cJTAG.c
+    ../../Core/Src/winusb1.0_template.c
     # ../../Core/Src/W25Q32.c
 )
 

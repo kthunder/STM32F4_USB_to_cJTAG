@@ -13,7 +13,7 @@
  #define CONFIG_USB_PRINTF(...) printf(__VA_ARGS__)
  
  #ifndef CONFIG_USB_DBG_LEVEL
- #define CONFIG_USB_DBG_LEVEL USB_DBG_INFO
+ #define CONFIG_USB_DBG_LEVEL USB_DBG_ERROR
  #endif
  
  /* Enable print with color */
@@ -35,7 +35,7 @@
  #endif
  
  /* Setup packet log for debug */
- #define CONFIG_USBDEV_SETUP_LOG_PRINT
+//  #define CONFIG_USBDEV_SETUP_LOG_PRINT
  
  /* Check if the input descriptor is correct */
  #define CONFIG_USBDEV_DESC_CHECK

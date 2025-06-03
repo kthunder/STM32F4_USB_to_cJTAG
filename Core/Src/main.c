@@ -21,26 +21,27 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "SEGGER_RTT.h"
-#include "winusb1.0_template.c"
-#include "log.h"
+// ***用户***头文件
+#include <stdio.h>
 #include <stdbool.h>
-
+#include "SEGGER_RTT.h"
+#include "log.h"
+#include "chry_ringbuffer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+// ***用户***私有类型定义
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+// ***用户***私有定义
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+// ***用户***私有宏定义
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -49,8 +50,10 @@ UART_HandleTypeDef huart1;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-extern uint8_t myUsbRxData[];
-extern uint16_t myUsbRxNum;
+// ***用户***私有变量
+chry_ringbuffer_t rb;
+uint8_t mempool[1024];
+uint8_t temp[64];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,7 +62,7 @@ static void MX_GPIO_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-// static void MX_GPIO_Init_ex(void);
+// ***用户***私有函数签名
 // extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
 //                            uint32_t bits);
 // extern void cJtag_active();
@@ -68,6 +71,7 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+// ***用户***私有代码0
 // commom functions
 int __io_getchar(FILE *file) {
   (void)file;
@@ -96,7 +100,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  // ***用户***私有代码1
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -105,13 +109,15 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  // ***用户***初始化
+  chry_ringbuffer_init(&rb, mempool, 1024);
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  // ***用户***系统初始化
   HAL_EnableCompensationCell();
   /* USER CODE END SysInit */
 
@@ -120,10 +126,8 @@ int main(void)
   // MX_USB_OTG_FS_PCD_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  // HAL_Delay(5000);
-  // MX_GPIO_Init_ex();
-  // log_set_level(LOG_DEBUG);
-  // log_info("SWD Disabled!");
+  // ***用户***私有代码2
+  log_set_level(LOG_DEBUG);
   // cJtag_active(); 
   // test();
   winusb_init(0, USB_OTG_FS);
@@ -133,11 +137,18 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+    // ***用户***循环代码
     // extern void cdc_acm_data_send_with_dtr_test(uint8_t busid);
     // cdc_acm_data_send_with_dtr_test(0);
+    uint8_t len =  chry_ringbuffer_read(&rb, temp, 1000);
+    if (len) {
+      printf("hello %d\r\n", len);
+    }
+    HAL_Delay(10);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    // ***用户***私有代码3
   }
   /* USER CODE END 3 */
 }
