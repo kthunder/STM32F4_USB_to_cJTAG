@@ -6,14 +6,14 @@
 /*******************************SQE*******************************/
 /*------------------------PIN OPERATION PORTING----------------------------------*/
 // clang-format off
-#define PIN_TCK_OUT(bit)       GPIOA->BSRR = (TCKC_Pin << (bit?0:16))
-#define PIN_TMS_OUT(bit)       GPIOA->BSRR = (TMSC_Pin << (bit?0:16))
-#define PIN_TDI_OUT(bit)       PIN_TMS_OUT(bit)
-#define PIN_TDO_IN()           ((GPIOA->IDR & TMSC_Pin)>0)
-#define PIN_TMS_INPUT_ENABLE()  GPIOA->MODER &= ~GPIO_MODER_MODE14_0
-#define PIN_TMS_INPUT_DISABLE() GPIOA->MODER |= GPIO_MODER_MODER14_0
-#define PIN_TMSC_OUT_SIDE_SET(bit)  GPIOA->BSRR = (TCKC_Pin<< 0)|(TMSC_Pin << (bit?0:16))
-#define PIN_TMSC_OUT_SIDE_CLR(bit)  GPIOA->BSRR = (TCKC_Pin<<16)|(TMSC_Pin << (bit?0:16))
+#define PIN_TCK_OUT(bit)       GPIOA->BSRR = (TCKC_Pin << (bit?0:16));__NOP();
+#define PIN_TMS_OUT(bit)       GPIOA->BSRR = (TMSC_Pin << (bit?0:16));__NOP();
+#define PIN_TDI_OUT(bit)       PIN_TMS_OUT(bit);__NOP();
+#define PIN_TDO_IN()           ((GPIOA->IDR & TMSC_Pin)>0);__NOP();
+#define PIN_TMS_INPUT_ENABLE()  GPIOA->MODER &= ~GPIO_MODER_MODE2_0;__NOP();
+#define PIN_TMS_INPUT_DISABLE() GPIOA->MODER |= GPIO_MODER_MODER2_0;__NOP();
+#define PIN_TMSC_OUT_SIDE_SET(bit)  GPIOA->BSRR = (TCKC_Pin<< 0)|(TMSC_Pin << (bit?0:16));__NOP();
+#define PIN_TMSC_OUT_SIDE_CLR(bit)  GPIOA->BSRR = (TCKC_Pin<<16)|(TMSC_Pin << (bit?0:16));__NOP();
 // clang-format on
 char binary_string[64] = {0};
 char *to_binary_string(unsigned int value, uint32_t bits)
@@ -145,7 +145,46 @@ void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO)
         ucTDI++;
         *ucTDO++ = tmp;
     }
-    // printf("\n");
+
+    /*******************************log*******************************/
+    // switch (bits)
+    // {
+    // case 5:
+    //     printf("IR shift\n");
+    //     printf("    out %d bits,[0x%X] %s\n", bits, *(uint32_t *)ucTDI, to_binary_string(*(uint8_t *)ucTDI, bits));
+    //     printf("    in  %d bits,[0x%X] %s\n", bits, *(uint32_t *)ucTDO, to_binary_string(*(uint8_t *)ucTDO, bits));
+    //     break;
+    // case 32:
+    //     printf("DR shift\n");
+    //     printf("    out %d bits,[0x%X] %s\n", bits, *(uint32_t *)ucTDI, to_binary_string(*(uint32_t *)ucTDI, bits));
+    //     printf("    in  %d bits,[0x%X] %s\n", bits, *(uint32_t *)ucTDO, to_binary_string(*(uint32_t *)ucTDO, bits));
+    //     break;
+    // case 44:
+    //     // printf("DR shift\n");
+    //     // printf("    out %d bits,[%X %X] %s\n", bits, *(uint32_t *)out_data, *(uint32_t *)(out_data + 4), to_binary_string(*(uint32_t *)out_data, bits));
+    //     // printf("    in  %d bits,[%X %X] %s\n", bits, *(uint32_t *)in_data, *(uint32_t *)(in_data + 4), to_binary_string(*(uint32_t *)in_data, bits));
+    //     typedef struct
+    //     {
+    //         uint64_t op : 2;
+    //         uint64_t data : 32;
+    //         uint64_t addr : 10;
+    //     } DMI_TypeDef;
+
+    //     DMI_TypeDef *d = (DMI_TypeDef *)ucTDI;
+    //     printf("---- DMI SCAN ----:\n");
+    //     printf("DMI shift out op : 0x%X \n", (uint32_t)d->op);
+    //     printf("            data: 0x%08X\n", (uint32_t)d->data);
+    //     printf("            addr: 0x%02X\n", (uint32_t)d->addr);
+    //     d = (DMI_TypeDef *)ucTDO;
+    //     printf("DMI shift in  op : 0x%X \n", (uint32_t)d->op);
+    //     printf("            data: 0x%08X\n", (uint32_t)d->data);
+    //     printf("            addr: 0x%02X\n", (uint32_t)d->addr);
+    //     /* code */
+    //     break;
+
+    // default:
+    //     break;
+    // }
 }
 
 void cJTAG_tms(uint32_t bits, uint8_t* ucTMS)
@@ -222,9 +261,9 @@ int test(void)
     uint32_t dr_r = 0;
 
     cJTAG_operation_ir_scan((uint8_t *)&ir_w, (uint8_t *)&ir_r, 5);
-    log_info("IR_r : 0x%02X %s", ir_r, to_binary_string(ir_r, 5));
+    printf("IR_r : 0x%02X %s\n", ir_r, to_binary_string(ir_r, 5));
     cJTAG_operation_dr_scan((uint8_t *)&dr_w, (uint8_t *)&dr_r, 32);
-    log_info("DR_r : 0x%08X %s", dr_r, to_binary_string(dr_r, 32));
+    printf("DR_r : 0x%08X %s\n", dr_r, to_binary_string(dr_r, 32));
 
     return 1;
 }

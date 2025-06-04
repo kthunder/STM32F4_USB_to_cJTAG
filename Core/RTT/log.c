@@ -144,7 +144,8 @@ int log_add_callback(log_LogFn fn, void *udata, int level)
 // 日志输出函数
 void log_log(int level, const char *file_name, int line, const char *fmt, ...)
 {
-    time_t t = osKernelGetTickCount()/1000;
+    time_t t = 1000;
+    // time_t t = osKernelGetTickCount()/1000;
 
     log_Event ev = {
         .fmt = fmt,

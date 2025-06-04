@@ -49,6 +49,8 @@ typedef struct
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 // ***用户***私有宏定义
+#define ROUND_UP(bits, n) ((bits + (n - 1)) / n)
+#define ROUND_UP_8(bits) ROUND_UP(bits, 8)
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -60,7 +62,9 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 // ***用户***私有变量
 chry_ringbuffer_t rb;
 uint8_t mempool[1024];
-uint8_t temp[64];
+
+uint8_t buff[64] = {0};
+command *curr_cmd = (command *)buff;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -76,6 +80,7 @@ extern void cJtag_active();
 extern void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO);
 extern void cJTAG_tms(uint32_t bits, uint8_t* ucTMS);
 extern int test(void);
+extern void usbd_winusb_write(uint8_t * buffer, uint32_t len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -94,10 +99,6 @@ int __io_putchar(char ch, FILE *file) {
   return 1;
 }
 
-uint8_t buff[64] = {0};
-command *curr_cmd = (command *)buff;
-// osMessageQueueId_t cmd_queue = NULL;
-
 void cJtag_task(void) {
   if (chry_ringbuffer_peek_byte(&rb, buff)) {
     // printf("len %d\r\n", buff[0]);
@@ -112,26 +113,16 @@ void cJtag_task(void) {
       case 0x80: // ir/dr scan
       {
         uint8_t buffer[0x100] = {0};
-        // printf("curr_cmd->bits %d\r\n", curr_cmd->bits);
-        // printf("sequence %s", to_binary_string(*(uint32_t *)curr_cmd->data, curr_cmd->bits));
-        // cJTAG_seq(curr_cmd->bits, (uint8_t *)&curr_cmd->data[0], buffer); //
-        // to Run-Test/Idle usb_io_write(, buffer); for (size_t i = 0; i <
-        // (curr_cmd->bits + 7) / 8; i++)
-        // {
-        //     xQueueSendToBack(xQueue_cmd_res, &buffer[i], 0);
-        // }
+        cJTAG_seq(curr_cmd->bits, (uint8_t *)&curr_cmd->data[0], buffer);
+        usbd_winusb_write(buffer, ROUND_UP_8(curr_cmd->bits));
       } break;
       case 1: // tms
       {
-        // printf("curr_cmd->bits %d\r\n", curr_cmd->bits);
-        // printf("tms %s", to_binary_string(*(uint32_t *)curr_cmd->data, curr_cmd->bits));
-        // cJTAG_tms(curr_cmd->bits, (uint8_t *)&curr_cmd->data[0]);
-        // usb_io_write(1, &buffer);
+        cJTAG_tms(curr_cmd->bits, (uint8_t *)&curr_cmd->data[0]);
       } break;
       case 0xFF:
       {
         cJtag_active();
-        // printf("active %s", to_binary_stri4ng(*(uint32_t *)curr_cmd->data, curr_cmd->bits));
         break;
       }
       default:
@@ -178,9 +169,9 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   // ***用户***私有代码2
-  log_set_level(LOG_DEBUG);
-  // cJtag_active(); 
-  // test();
+  // log_set_level(LOG_DEBUG);
+  cJtag_active(); 
+  test();
   winusb_init(0, USB_OTG_FS);
   /* USER CODE END 2 */
 
@@ -188,12 +179,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) {
     // ***用户***循环代码
-    // extern void cdc_acm_data_send_with_dtr_test(uint8_t busid);
-    // cdc_acm_data_send_with_dtr_test(0);
-    // uint8_t len =  chry_ringbuffer_read(&rb, temp, 1000);
-    // if (len) {
-    //   printf("hello %d\r\n", len);
-    // }
     cJtag_task();
     /* USER CODE END WHILE */
 

@@ -165,10 +165,10 @@ struct usb_msosv1_descriptor msosv1_desc = {
 };
 
 #define WINUSB_IN_EP  0x81
-#define WINUSB_OUT_EP 0x02
+#define WINUSB_OUT_EP 0x01
 
-#define USBD_VID           0xefff
-#define USBD_PID           0xffff
+#define USBD_VID           0x1D50
+#define USBD_PID           0x60AC
 #define USBD_MAX_POWER     100
 #define USBD_LANGID_STRING 1033
 
@@ -453,10 +453,13 @@ void usbd_winusb_out(uint8_t busid, uint8_t ep, uint32_t nbytes)
     // }
     printf("--------------%s\r\n", __func__);
     chry_ringbuffer_write(&rb, read_buffer, nbytes);
-    memset(read_buffer, 0xaa, 64);
-    usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, 64);
     /* setup next out ep read transfer */
     usbd_ep_start_read(busid, WINUSB_OUT_EP, read_buffer, 64);
+}
+
+void usbd_winusb_write(uint8_t * buffer, uint32_t len)
+{
+    usbd_ep_start_write(0, WINUSB_IN_EP, buffer, len);
 }
 
 void usbd_winusb_in(uint8_t busid, uint8_t ep, uint32_t nbytes)
