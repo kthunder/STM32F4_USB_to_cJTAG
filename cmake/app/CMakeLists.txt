@@ -11,16 +11,13 @@ target_compile_definitions(app INTERFACE
 )
 
 target_include_directories(app INTERFACE
-    ../../Core/RTT
+    # ../../Core/RTT
 )
 
 target_sources(app INTERFACE
-    ../../Core/RTT/log.c
-    ../../Core/RTT/SEGGER_RTT.c
-    ../../Core/RTT/SEGGER_RTT_ASM_ARMv7M.s
+    ../../Core/Src/log.c
     ../../Core/Src/cJTAG.c
     ../../Core/Src/winusb1.0_template.c
-    # ../../Core/Src/W25Q32.c
 )
 
 target_link_directories(app INTERFACE

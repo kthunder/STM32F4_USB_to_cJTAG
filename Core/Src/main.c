@@ -24,9 +24,9 @@
 // ***用户***头文件
 #include <stdio.h>
 #include <stdbool.h>
-#include "SEGGER_RTT.h"
 #include "log.h"
 #include "chry_ringbuffer.h"
+#include "winusb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
