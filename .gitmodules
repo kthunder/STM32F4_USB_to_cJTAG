@@ -4,3 +4,6 @@
 [submodule "libs/CherryRB"]
 	path = libs/CherryRB
 	url = git@github.com:cherry-embedded/CherryRB.git
+[submodule "libs/CherryDAP"]
+	path = libs/CherryDAP
+	url = https://github.com/cherry-embedded/CherryDAP.git
