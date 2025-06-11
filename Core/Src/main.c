@@ -99,11 +99,17 @@ int __io_putchar(char ch, FILE *file) {
   return 1;
 }
 
+void LED_TogglePin(void)
+{
+  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+}
+
 void cJtag_task(void) {
   if (chry_ringbuffer_peek_byte(&rb, buff)) {
     // printf("len %d\r\n", buff[0]);
     if (buff[0] <= chry_ringbuffer_get_used(&rb)) {
       chry_ringbuffer_read(&rb, buff, buff[0]);
+      LED_TogglePin();
       // recive a cmd
       // log_info("--cmd %d---", count++);
       // log_info("cmd[%02X]bits[%d]", curr_cmd->opcode, curr_cmd->bits);
@@ -160,6 +166,7 @@ int main(void)
   /* USER CODE BEGIN SysInit */
   // ***用户***系统初始化
   HAL_EnableCompensationCell();
+  winusb_init(0, (uintptr_t)USB_OTG_FS);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -171,7 +178,6 @@ int main(void)
   // log_set_level(LOG_DEBUG);
   cJtag_active(); 
   test();
-  winusb_init(0, (uintptr_t)USB_OTG_FS);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -179,6 +185,11 @@ int main(void)
   while (1) {
     // ***用户***循环代码
     cJtag_task();
+    static uint32_t tick = 0;
+    if ((HAL_GetTick() - tick)>1000) {
+      LED_TogglePin();
+      tick = HAL_GetTick();
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

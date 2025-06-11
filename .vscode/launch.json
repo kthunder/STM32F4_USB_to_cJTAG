@@ -7,7 +7,7 @@
         {
             "name": "launch",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/${workspaceFolderBasename}.elf",
+            "executable": "./build/Debug/${workspaceFolderBasename}.elf",
             "request": "launch",
             "type": "cortex-debug",
             "runToEntryPoint": "main",
@@ -42,7 +42,7 @@
         {
             "name": "attach",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/${workspaceFolderBasename}.elf",
+            "executable": "./build/Debug/${workspaceFolderBasename}.elf",
             "request": "attach",
             "type": "cortex-debug",
             "runToEntryPoint": "main",

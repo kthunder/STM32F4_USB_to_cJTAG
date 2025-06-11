@@ -32,7 +32,8 @@ def speed_test():
 if __name__ == "__main__":
     print(usb.util.get_string(dev, dev.iProduct))  # 产品名称
     print(hex(dev.bcdUSB))  # U
-    ep_out.write(bytearray([5,0xFF,0x08,0x00,0xff]))
+    # for _ in range(10):
+    ep_out.write(bytearray([5,0x01,0x08,0x00,0xff]))
     # ep_out.write(bytearray([5,0x80,0x08,0x00,0xff]))
     # ep_out.write(bytearray([6,0x0,0x09,0x00,0x55,0x55]))
     # ep_out.write(bytearray([6,0x1,0x0A,0x00,0xAA,0xAA]))
