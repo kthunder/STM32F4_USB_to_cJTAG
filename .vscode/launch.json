@@ -24,9 +24,8 @@
                 "enabled": false,
                 "samplesPerSecond": 4
             },
-            "preLaunchTask": "Build",
             "rttConfig": {
-                "enabled": true,
+                "enabled": false,
                 "searchId": "SEGGER RTT",
                 "address": "536871312",
                 "searchSize": 2000,
