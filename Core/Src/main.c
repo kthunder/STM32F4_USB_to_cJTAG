@@ -76,7 +76,7 @@ static void MX_USART1_UART_Init(void);
 // ***用户***私有函数签名
 extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
                            uint32_t bits);
-extern void cJtag_active();
+extern void cJtag_active(void);
 extern void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO);
 extern void cJTAG_tms(uint32_t bits, uint8_t* ucTMS);
 extern int test(void);
@@ -105,7 +105,6 @@ void cJtag_task(void) {
     if (buff[0] <= chry_ringbuffer_get_used(&rb)) {
       chry_ringbuffer_read(&rb, buff, buff[0]);
       // recive a cmd
-      static uint8_t count = 0;
       // log_info("--cmd %d---", count++);
       // log_info("cmd[%02X]bits[%d]", curr_cmd->opcode, curr_cmd->bits);
       switch (curr_cmd->opcode) {
@@ -172,7 +171,7 @@ int main(void)
   // log_set_level(LOG_DEBUG);
   cJtag_active(); 
   test();
-  winusb_init(0, USB_OTG_FS);
+  winusb_init(0, (uintptr_t)USB_OTG_FS);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -309,15 +308,26 @@ static void MX_USB_OTG_FS_PCD_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, TCKC_Pin|TMSC_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LED_Pin */
+  GPIO_InitStruct.Pin = LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : TCKC_Pin TMSC_Pin */
   GPIO_InitStruct.Pin = TCKC_Pin|TMSC_Pin;
@@ -326,8 +336,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
