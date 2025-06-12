@@ -14,12 +14,11 @@ target_compile_definitions(CherryDAP INTERFACE
 set(DAP_PATH Drivers/CMSIS/DAP/Firmware)
 
 target_include_directories(CherryDAP INTERFACE
-    ${CMAKE_SOURCE_DIR}/libs/CherryDAP
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Include
 )
 
 target_sources(CherryDAP INTERFACE
-    ${CMAKE_SOURCE_DIR}/libs/CherryDAP/dap_main.c
+    ${CMAKE_SOURCE_DIR}/Core/Src/dap_main.c
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/DAP_vendor.c
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/DAP.c
     ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/JTAG_DP.c

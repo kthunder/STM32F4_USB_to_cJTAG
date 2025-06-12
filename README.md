@@ -63,18 +63,3 @@ libusb_set_interface_alt_setting(dev_handle, 0, 0);
 libusb_bulk_transfer(dev_handle, ED_IN, data, length, &actual_length, 1000);
 libusb_bulk_transfer(dev_handle, ED_OUT, data, length, &actual_length, 1000);
 ```
-
-
-
-#define DAP_IN_EP  0x81
-#define DAP_OUT_EP 0x01
-
-#define CDC_IN_EP  0x82
-#define CDC_OUT_EP 0x02
-#define CDC_INT_EP 0x83
-
-#define MSC_IN_EP  0x86
-#define MSC_OUT_EP 0x07
-
-#define USBD_VID           0x0D28
-#define USBD_PID           0x0201

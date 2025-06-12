@@ -26,7 +26,7 @@
 #include <stdbool.h>
 #include "log.h"
 #include "chry_ringbuffer.h"
-#include "winusb.h"
+// #include "winusb.h"
 #include "dap_main.h"
 /* USER CODE END Includes */
 
