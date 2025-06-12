@@ -10,19 +10,22 @@ target_compile_definitions(CherryDAP INTERFACE
     $<$<CONFIG:Debug>:DEBUG>
 )
 
+# set(DAP_PATH libs/CherryDAP/DAP)
+set(DAP_PATH Drivers/CMSIS/DAP/Firmware)
+
 target_include_directories(CherryDAP INTERFACE
-    ../../libs/CherryDAP
-    ../../libs/CherryDAP/DAP/Include
+    ${CMAKE_SOURCE_DIR}/libs/CherryDAP
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Include
 )
 
 target_sources(CherryDAP INTERFACE
-    ../../libs/CherryDAP/dap_main.c
-    ../../libs/CherryDAP/DAP/Source/DAP_vendor.c
-    ../../libs/CherryDAP/DAP/Source/DAP.c
-    ../../libs/CherryDAP/DAP/Source/JTAG_DP.c
-    ../../libs/CherryDAP/DAP/Source/SW_DP.c
-    ../../libs/CherryDAP/DAP/Source/SWO.c
-    ../../libs/CherryDAP/DAP/Source/UART.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryDAP/dap_main.c
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/DAP_vendor.c
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/DAP.c
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/JTAG_DP.c
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/SW_DP.c
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/SWO.c
+    ${CMAKE_SOURCE_DIR}/${DAP_PATH}/Source/UART.c
 )
 
 target_link_directories(CherryDAP INTERFACE

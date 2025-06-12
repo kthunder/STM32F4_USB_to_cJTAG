@@ -27,6 +27,7 @@
 #include "log.h"
 #include "chry_ringbuffer.h"
 #include "winusb.h"
+#include "dap_main.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -157,7 +158,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   // ***用户***初始化
-  chry_ringbuffer_init(&rb, mempool, 1024);
+  // chry_ringbuffer_init(&rb, mempool, 1024);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -166,7 +167,7 @@ int main(void)
   /* USER CODE BEGIN SysInit */
   // ***用户***系统初始化
   HAL_EnableCompensationCell();
-  winusb_init(0, (uintptr_t)USB_OTG_FS);
+  // winusb_init(0, (uintptr_t)USB_OTG_FS);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -176,24 +177,27 @@ int main(void)
   /* USER CODE BEGIN 2 */
   // ***用户***私有代码2
   // log_set_level(LOG_DEBUG);
-  cJtag_active(); 
-  test();
+  chry_dap_init(0, (uintptr_t)USB_OTG_FS);
+  // cJtag_active(); 
+  // test();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
     // ***用户***循环代码
-    cJtag_task();
-    static uint32_t tick = 0;
-    if ((HAL_GetTick() - tick)>1000) {
-      LED_TogglePin();
-      tick = HAL_GetTick();
-    }
+    // cJtag_task();
+    // static uint32_t tick = 0;
+    // if ((HAL_GetTick() - tick)>1000) {
+    //   LED_TogglePin();
+    //   tick = HAL_GetTick();
+    // }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     // ***用户***私有代码3
+    chry_dap_handle();
+    chry_dap_usb2uart_handle();
   }
   /* USER CODE END 3 */
 }

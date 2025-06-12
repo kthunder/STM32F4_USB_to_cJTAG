@@ -11,26 +11,26 @@ target_compile_definitions(CherryUSB INTERFACE
 )
 
 target_include_directories(CherryUSB INTERFACE
-    ../../libs/CherryUSB/core
-    ../../libs/CherryUSB/common
-    ../../libs/CherryUSB/class/hub
-    ../../libs/CherryUSB/class/cdc
-    ../../libs/CherryUSB/class/msc
-    ../../libs/CherryUSB/demo
-    ../../libs/CherryUSB/port/dwc2
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/core
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/common
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/class/hub
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/class/cdc
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/class/msc
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/demo
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/port/dwc2
 
-    ../../libs/CherryRB
+    ${CMAKE_SOURCE_DIR}/libs/CherryRB
 )
 
 target_sources(CherryUSB INTERFACE
-    ../../libs/CherryUSB/core/usbd_core.c
-    ../../libs/CherryUSB/port/dwc2/usb_dc_dwc2.c
-    ../../libs/CherryUSB/port/dwc2/usb_glue_st.c
-    ../../libs/CherryUSB/class/msc/usbd_msc.c
-    ../../libs/CherryUSB/class/msc/usbd_msc.c
-    ../../libs/CherryUSB/class/cdc/usbd_cdc_acm.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/core/usbd_core.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/port/dwc2/usb_dc_dwc2.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/port/dwc2/usb_glue_st.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/class/msc/usbd_msc.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/class/msc/usbd_msc.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryUSB/class/cdc/usbd_cdc_acm.c
 
-    ../../libs/CherryRB/chry_ringbuffer.c
+    ${CMAKE_SOURCE_DIR}/libs/CherryRB/chry_ringbuffer.c
 )
 
 target_link_directories(CherryUSB INTERFACE

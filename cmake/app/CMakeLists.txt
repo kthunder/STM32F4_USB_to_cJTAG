@@ -11,13 +11,13 @@ target_compile_definitions(app INTERFACE
 )
 
 target_include_directories(app INTERFACE
-    # ../../Core/RTT
+    # ${CMAKE_SOURCE_DIR}/Core/RTT
 )
 
 target_sources(app INTERFACE
-    ../../Core/Src/log.c
-    ../../Core/Src/cJTAG.c
-    ../../Core/Src/winusb1.0_template.c
+    ${CMAKE_SOURCE_DIR}/Core/Src/log.c
+    ${CMAKE_SOURCE_DIR}/Core/Src/cJTAG.c
+    ${CMAKE_SOURCE_DIR}/Core/Src/winusb1.0_template.c
 )
 
 target_link_directories(app INTERFACE

@@ -73,5 +73,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
     app
     CherryUSB
+    CherryDAP
     # Add user defined libraries
 )

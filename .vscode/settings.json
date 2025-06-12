@@ -23,5 +23,5 @@
         "--header-insertion=never",
         "--clang-tidy",
         "--log=verbose"
-    ]
+    ],
 }
