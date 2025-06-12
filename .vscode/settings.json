@@ -17,7 +17,7 @@
         "-j=12",
         "--background-index",
         "--query-driver=C:/Users/Administrator/.pico-sdk/toolchain/14_2_Rel1/bin/arm-none-eabi-*", //设置交叉编译器路径
-        "--compile-commands-dir=${workspaceFolder}/build",
+        "--compile-commands-dir=${workspaceFolder}/build/Debug",
         "--all-scopes-completion",
         "--completion-style=detailed",
         "--header-insertion=never",
