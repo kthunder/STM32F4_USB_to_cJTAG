@@ -1,3 +1,4 @@
+#include "log.h"
 #include "dap_main.h"
 #include "DAP_config.h"
 #include "DAP.h"
@@ -133,7 +134,7 @@ static const uint8_t other_speed_config_descriptor[] = {
 char *string_descriptors[] = {
         (char[]) {0x09, 0x04},             /* Langid */
         "CherryUSB",                        /* Manufacturer */
-        "CherryUSB CMSIS-DAP",              /* Product */
+        "CherryDAP",                        /* Product */
         "00000000000000000123456789ABCDEF", /* Serial Number */
 };
 

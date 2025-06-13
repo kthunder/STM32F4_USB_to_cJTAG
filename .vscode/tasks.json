@@ -16,7 +16,7 @@
         {
             "type": "shell",
             "label": "Build",
-            "command": "cmake.exe --build C:/Users/Administrator/Desktop/WS/00_project/cw2225_tool/build/Debug --target all --",
+            "command": "cmake.exe --build ./build/Debug --target all --",
             "options": {
                 "cwd": "${workspaceFolder}"
             },

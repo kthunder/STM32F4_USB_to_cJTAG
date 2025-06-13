@@ -167,7 +167,6 @@ int main(void)
   /* USER CODE BEGIN SysInit */
   // ***用户***系统初始化
   HAL_EnableCompensationCell();
-  // winusb_init(0, (uintptr_t)USB_OTG_FS);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -177,6 +176,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   // ***用户***私有代码2
   // log_set_level(LOG_DEBUG);
+  // winusb_init(0, (uintptr_t)USB_OTG_FS);
   chry_dap_init(0, (uintptr_t)USB_OTG_FS);
   // cJtag_active(); 
   // test();
@@ -187,11 +187,11 @@ int main(void)
   while (1) {
     // ***用户***循环代码
     // cJtag_task();
-    // static uint32_t tick = 0;
-    // if ((HAL_GetTick() - tick)>1000) {
-    //   LED_TogglePin();
-    //   tick = HAL_GetTick();
-    // }
+    static uint32_t tick = 0;
+    if ((HAL_GetTick() - tick)>2000) {
+      LED_TogglePin();
+      tick = HAL_GetTick();
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
