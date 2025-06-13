@@ -6,14 +6,14 @@
 /*******************************SQE*******************************/
 /*------------------------PIN OPERATION PORTING----------------------------------*/
 // clang-format off
-#define PIN_TCK_OUT(bit)       GPIOA->BSRR = (TCKC_Pin << (bit?0:16));__NOP();
-#define PIN_TMS_OUT(bit)       GPIOA->BSRR = (TMSC_Pin << (bit?0:16));__NOP();
+#define PIN_TCK_OUT(bit)       TCKC_GPIO_Port->BSRR = (TCKC_Pin << (bit?0:16));__NOP();
+#define PIN_TMS_OUT(bit)       TMSC_GPIO_Port->BSRR = (TMSC_Pin << (bit?0:16));__NOP();
 #define PIN_TDI_OUT(bit)       PIN_TMS_OUT(bit);__NOP();
-#define PIN_TDO_IN()           ((GPIOA->IDR & TMSC_Pin)>0);__NOP();
-#define PIN_TMS_INPUT_ENABLE()  GPIOA->MODER &= ~GPIO_MODER_MODE2_0;__NOP();
-#define PIN_TMS_INPUT_DISABLE() GPIOA->MODER |= GPIO_MODER_MODER2_0;__NOP();
-#define PIN_TMSC_OUT_SIDE_SET(bit)  GPIOA->BSRR = (TCKC_Pin<< 0)|(TMSC_Pin << (bit?0:16));__NOP();
-#define PIN_TMSC_OUT_SIDE_CLR(bit)  GPIOA->BSRR = (TCKC_Pin<<16)|(TMSC_Pin << (bit?0:16));__NOP();
+#define PIN_TDO_IN()           ((TMSC_GPIO_Port->IDR & TMSC_Pin)>0);__NOP();
+#define PIN_TMS_INPUT_ENABLE()  TMSC_GPIO_Port->MODER &= ~GPIO_MODER_MODE2_0;__NOP();
+#define PIN_TMS_INPUT_DISABLE() TMSC_GPIO_Port->MODER |= GPIO_MODER_MODER2_0;__NOP();
+#define PIN_TMSC_OUT_SIDE_SET(bit)  TMSC_GPIO_Port->BSRR = (TCKC_Pin<< 0)|(TMSC_Pin << (bit?0:16));__NOP();
+#define PIN_TMSC_OUT_SIDE_CLR(bit)  TMSC_GPIO_Port->BSRR = (TCKC_Pin<<16)|(TMSC_Pin << (bit?0:16));__NOP();
 // clang-format on
 char binary_string[64] = {0};
 char *to_binary_string(unsigned int value, uint32_t bits)
