@@ -171,7 +171,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  // MX_USB_OTG_FS_PCD_Init();
+  //MX_USB_OTG_FS_PCD_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   // ***用户***私有代码2
@@ -187,11 +187,11 @@ int main(void)
   while (1) {
     // ***用户***循环代码
     // cJtag_task();
-    static uint32_t tick = 0;
-    if ((HAL_GetTick() - tick)>2000) {
-      LED_TogglePin();
-      tick = HAL_GetTick();
-    }
+    // static uint32_t tick = 0;
+    // if ((HAL_GetTick() - tick)>2000) {
+    //   LED_TogglePin();
+    //   tick = HAL_GetTick();
+    // }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -332,10 +332,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, TCKC_Pin|TMSC_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, TCKC_Pin|TMSC_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : LED_Pin */
   GPIO_InitStruct.Pin = LED_Pin;
@@ -348,7 +348,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = TCKC_Pin|TMSC_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
