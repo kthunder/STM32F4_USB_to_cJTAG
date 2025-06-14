@@ -302,7 +302,14 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
  - \ref PIN_SWDIO_IN to read from the SWDIO I/O pin with utmost possible speed.
  - \ref PIN_SWDIO_OUT to write to the SWDIO I/O pin with utmost possible speed.
 */
-
+// clang-format off
+#define PORT_PIN_SWCLK_OUT(bit)       TCKC_GPIO_Port->BSRR = (TCKC_Pin << (bit?0:16))
+#define PORT_PIN_SWDIO_OUT(bit)       TMSC_GPIO_Port->BSRR = (TMSC_Pin << (bit?0:16))
+#define PORT_PIN_SWCLK_IN()           ((TCKC_GPIO_Port->IDR & TCKC_Pin)>0)
+#define PORT_PIN_SWDIO_IN()           ((TMSC_GPIO_Port->IDR & TMSC_Pin)>0)
+#define PORT_PIN_SWDIO_INPUT_ENABLE()  TMSC_GPIO_Port->MODER &= ~GPIO_MODER_MODE2_0
+#define PORT_PIN_SWDIO_INPUT_DISABLE() TMSC_GPIO_Port->MODER |= GPIO_MODER_MODER2_0
+// clang-format on
 
 // Configure DAP I/O pins ------------------------------
 
@@ -339,21 +346,21 @@ __STATIC_INLINE void PORT_OFF (void) {
 \return Current status of the SWCLK/TCK DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWCLK_TCK_IN  (void) {
-  return ((TCKC_GPIO_Port->IDR & TCKC_Pin)>0);
+  return (PORT_PIN_SWCLK_IN());
 }
 
 /** SWCLK/TCK I/O pin: Set Output to High.
 Set the SWCLK/TCK DAP hardware I/O pin to high level.
 */
 __STATIC_FORCEINLINE void     PIN_SWCLK_TCK_SET (void) {
-  TCKC_GPIO_Port->BSRR = (TCKC_Pin << (1?0:16));
+  PORT_PIN_SWCLK_OUT(1U);
 }
 
 /** SWCLK/TCK I/O pin: Set Output to Low.
 Set the SWCLK/TCK DAP hardware I/O pin to low level.
 */
 __STATIC_FORCEINLINE void     PIN_SWCLK_TCK_CLR (void) {
-  TCKC_GPIO_Port->BSRR = (TCKC_Pin << (0?0:16));
+  PORT_PIN_SWCLK_OUT(0U);
 }
 
 
@@ -363,35 +370,35 @@ __STATIC_FORCEINLINE void     PIN_SWCLK_TCK_CLR (void) {
 \return Current status of the SWDIO/TMS DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWDIO_TMS_IN  (void) {
-  return ((TMSC_GPIO_Port->IDR & TMSC_Pin)>0);
+  return (PORT_PIN_SWDIO_IN());
 }
 
 /** SWDIO/TMS I/O pin: Set Output to High.
 Set the SWDIO/TMS DAP hardware I/O pin to high level.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_TMS_SET (void) {
-  TMSC_GPIO_Port->BSRR = (TMSC_Pin << (1?0:16));
+  PORT_PIN_SWDIO_OUT(1U);
 }
 
 /** SWDIO/TMS I/O pin: Set Output to Low.
 Set the SWDIO/TMS DAP hardware I/O pin to low level.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_TMS_CLR (void) {
-  TMSC_GPIO_Port->BSRR = (TMSC_Pin << (0?0:16));
+  PORT_PIN_SWDIO_OUT(0U);
 }
 
 /** SWDIO I/O pin: Get Input (used in SWD mode only).
 \return Current status of the SWDIO DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWDIO_IN      (void) {
-  return ((TMSC_GPIO_Port->IDR & TMSC_Pin)>0);
+  return (PORT_PIN_SWDIO_IN());
 }
 
 /** SWDIO I/O pin: Set Output (used in SWD mode only).
 \param bit Output value for the SWDIO DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_OUT     (uint32_t bit) {
-  TMSC_GPIO_Port->BSRR = (TMSC_Pin << (bit?0:16));
+  PORT_PIN_SWDIO_OUT(bit&1U);
 }
 
 /** SWDIO I/O pin: Switch to Output mode (used in SWD mode only).
@@ -399,7 +406,7 @@ Configure the SWDIO DAP hardware I/O pin to output mode. This function is
 called prior \ref PIN_SWDIO_OUT function calls.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_OUT_ENABLE  (void) {
-  TMSC_GPIO_Port->MODER |= GPIO_MODER_MODER2_0;
+  PORT_PIN_SWDIO_INPUT_DISABLE();
 }
 
 /** SWDIO I/O pin: Switch to Input mode (used in SWD mode only).
@@ -407,7 +414,7 @@ Configure the SWDIO DAP hardware I/O pin to input mode. This function is
 called prior \ref PIN_SWDIO_IN function calls.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_OUT_DISABLE (void) {
-  TMSC_GPIO_Port->MODER &= ~GPIO_MODER_MODER2_0;
+  PORT_PIN_SWDIO_INPUT_ENABLE();
 }
 
 
@@ -502,7 +509,9 @@ __STATIC_INLINE void LED_CONNECTED_OUT (uint32_t bit) {}
            - 1: Target Running LED ON: program execution in target started.
            - 0: Target Running LED OFF: program execution in target stopped.
 */
-__STATIC_INLINE void LED_RUNNING_OUT (uint32_t bit) {}
+__STATIC_INLINE void LED_RUNNING_OUT (uint32_t bit) {
+  LED_GPIO_Port->BSRR = (LED_Pin << (bit?0:16));
+}
 
 ///@}
 
