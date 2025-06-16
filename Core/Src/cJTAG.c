@@ -101,30 +101,6 @@ static void JTAG_sequence_tms(uint32_t val, uint32_t bit_len)
     }
 }
 /*******************************interface*******************************/
-void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO, uint32_t bits)
-{
-    bool tms, tdi, tdo;
-    uint8_t tmp = 0;
-    uint32_t cycle = (bits + 7) / 8;
-    uint32_t last_count = bits - (8 * (cycle - 1));
-    for (size_t i = 1; i <= cycle; i++)
-    {
-        tmp = 0;
-        for (size_t j = 0; j < (i == cycle ? last_count : 8); j++)
-        {
-            tms = (*ucTMS >> j) & 1;
-            tdi = (*ucTDI >> j) & 1;
-            JTAG_CYCLE_TCK_FAST(tms, tdi, tdo);
-            // printf("%d ", tdo);
-            tmp |= tdo << j;
-        }
-        ucTMS++;
-        ucTDI++;
-        *ucTDO++ = tmp;
-    }
-    // printf("\n");
-}
-
 void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO)
 {
     bool tms, tdi, tdo;
@@ -205,18 +181,14 @@ void cJTAG_operation_ir_scan(uint8_t *ir_w, uint8_t *ir_r, uint32_t bits)
     }
 
     uint32_t TMS = 0;
-    uint32_t TDI = 0;
-    uint32_t TDO = 0;
 
     TMS = 0x3;
-    cJTAG_sequence((uint8_t *)&TMS, (uint8_t *)&TDI, (uint8_t *)&TDO, 4); // to Shift-IR
+    cJTAG_tms(4, (uint8_t *)&TMS); // to Shift-IR
 
-    TMS = 0;
-    ARRAY_SET_BIT(&TMS, bits - 1, 1);
-    cJTAG_sequence((uint8_t *)&TMS, ir_w, ir_r, bits); // the last bit scan in exit1-IR
+    cJTAG_seq(bits, ir_w, ir_r); // the last bit scan in exit1-IR
 
     TMS = 0x1;
-    cJTAG_sequence((uint8_t *)&TMS, (uint8_t *)&TDI, (uint8_t *)&TDO, 2); // to Run-Test/Idle
+    cJTAG_tms(2, (uint8_t *)&TMS); // to Run-Test/Idle
 }
 
 void cJTAG_operation_dr_scan(uint8_t *dr_w, uint8_t *dr_r, uint32_t bits)
@@ -226,22 +198,18 @@ void cJTAG_operation_dr_scan(uint8_t *dr_w, uint8_t *dr_r, uint32_t bits)
         return;
     }
 
-    uint8_t ucTMS[0x100] = {0};
     uint32_t TMS = 0;
-    uint32_t TDI = 0;
-    uint32_t TDO = 0;
 
     TMS = 0x0;
-    cJTAG_sequence((uint8_t *)&TMS, (uint8_t *)&TDI, (uint8_t *)&TDO, 8); // waite busy clk in idle
+    cJTAG_tms(8, (uint8_t *)&TMS); // waite busy clk in idle
 
     TMS = 0x1;
-    cJTAG_sequence((uint8_t *)&TMS, (uint8_t *)&TDI, (uint8_t *)&TDO, 3); // to Shift-DR
+    cJTAG_tms(3, (uint8_t *)&TMS); // to Shift-DR
 
-    ARRAY_SET_BIT(ucTMS, bits - 1, 1);
-    cJTAG_sequence((uint8_t *)&ucTMS, dr_w, dr_r, bits); // the last bit scan in exit1-DR
+    cJTAG_seq(bits, dr_w, dr_r); // the last bit scan in exit1-DR
 
     TMS = 0x1;
-    cJTAG_sequence((uint8_t *)&TMS, (uint8_t *)&TDI, (uint8_t *)&TDO, 2); // to Run-Test/Idle
+    cJTAG_tms(2, (uint8_t *)&TMS); // to Run-Test/Idle
 }
 
 void cJtag_active()

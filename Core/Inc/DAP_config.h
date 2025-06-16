@@ -75,7 +75,7 @@ This information includes:
 
 /// Indicate that JTAG communication mode is available at the Debug Port.
 /// This information is returned by the command \ref DAP_Info as part of <b>Capabilities</b>.
-#define DAP_JTAG                0               ///< JTAG Mode: 1 = available, 0 = not available.
+#define DAP_JTAG                1               ///< JTAG Mode: 1 = available, 0 = not available.
 
 /// Configure maximum number of JTAG devices on the scan chain connected to the Debug Access Port.
 /// This setting impacts the RAM requirements of the Debug Unit. Valid range is 1 .. 255.
@@ -303,12 +303,84 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
  - \ref PIN_SWDIO_OUT to write to the SWDIO I/O pin with utmost possible speed.
 */
 // clang-format off
-#define PORT_PIN_SWCLK_OUT(bit)       TCKC_GPIO_Port->BSRR = (TCKC_Pin << (bit?0:16))
-#define PORT_PIN_SWDIO_OUT(bit)       TMSC_GPIO_Port->BSRR = (TMSC_Pin << (bit?0:16))
-#define PORT_PIN_SWCLK_IN()           ((TCKC_GPIO_Port->IDR & TCKC_Pin)>0)
-#define PORT_PIN_SWDIO_IN()           ((TMSC_GPIO_Port->IDR & TMSC_Pin)>0)
+#define PORT_PIN_SWCLK_OUT(bit)        TCKC_GPIO_Port->BSRR = (TCKC_Pin << (bit?0:16))
+#define PORT_PIN_SWDIO_OUT(bit)        TMSC_GPIO_Port->BSRR = (TMSC_Pin << (bit?0:16))
+#define PORT_PIN_SWCLK_IN()            ((TCKC_GPIO_Port->IDR & TCKC_Pin)>0)
+#define PORT_PIN_SWDIO_IN()            ((TMSC_GPIO_Port->IDR & TMSC_Pin)>0)
 #define PORT_PIN_SWDIO_INPUT_ENABLE()  TMSC_GPIO_Port->MODER &= ~GPIO_MODER_MODE2_0
 #define PORT_PIN_SWDIO_INPUT_DISABLE() TMSC_GPIO_Port->MODER |= GPIO_MODER_MODER2_0
+
+#define iPIN_TCK_OUT(bit)            TCKC_GPIO_Port->BSRR = (TCKC_Pin << (bit?0:16));__NOP();
+#define iPIN_TMS_OUT(bit)            TMSC_GPIO_Port->BSRR = (TMSC_Pin << (bit?0:16));__NOP();
+#define iPIN_TDI_OUT(bit)            iPIN_TMS_OUT(bit);__NOP();
+#define iPIN_TDO_IN()                ((TMSC_GPIO_Port->IDR & TMSC_Pin)>0);__NOP();
+#define iPIN_TMS_INPUT_ENABLE()      TMSC_GPIO_Port->MODER &= ~GPIO_MODER_MODE2_0;__NOP();
+#define iPIN_TMS_INPUT_DISABLE()     TMSC_GPIO_Port->MODER |= GPIO_MODER_MODER2_0;__NOP();
+#define iPIN_TMSC_OUT_SIDE_SET(bit)  TMSC_GPIO_Port->BSRR = (TCKC_Pin<< 0)|(TMSC_Pin << (bit?0:16));__NOP();
+#define iPIN_TMSC_OUT_SIDE_CLR(bit)  TMSC_GPIO_Port->BSRR = (TCKC_Pin<<16)|(TMSC_Pin << (bit?0:16));__NOP();
+
+#define iPIN_TCK_SET() iPIN_TCK_OUT(1)
+#define iPIN_TCK_CLR() iPIN_TCK_OUT(0)
+#define iPIN_TMS_SET() iPIN_TMS_OUT(1)
+#define iPIN_TMS_CLR() iPIN_TMS_OUT(0)
+
+#define JTAG_CYCLE_TCK_FAST(tms, tdi, tdo) \
+    do                                     \
+    {                                      \
+        iPIN_TMSC_OUT_SIDE_CLR(!tdi);       \
+        iPIN_TCK_SET();                     \
+        iPIN_TMSC_OUT_SIDE_CLR(tms);        \
+        iPIN_TCK_SET();                     \
+        iPIN_TMS_INPUT_ENABLE();            \
+        iPIN_TCK_CLR();                     \
+        iPIN_TCK_SET();                     \
+        tdo = iPIN_TDO_IN();                \
+        iPIN_TCK_CLR();                     \
+        iPIN_TMS_INPUT_DISABLE();           \
+    } while (0);
+
+
+// Generate cJTAG Sequence
+//   info:   sequence information
+//   tdi:    pointer to TDI generated data
+//   tdo:    pointer to TDO captured data
+//   return: none
+#include "DAP.h"
+__STATIC_INLINE void cJTAG_Sequence (uint32_t info, const uint8_t *tdi, uint8_t *tdo) {
+  uint32_t i_val;
+  uint32_t o_val;
+  uint32_t bit;
+  uint32_t n, k;
+
+  n = info & JTAG_SEQUENCE_TCK;
+  if (n == 0U) {
+    n = 64U;
+  }
+
+  // if (info & JTAG_SEQUENCE_TMS) {
+  //   PIN_TMS_SET();
+  // } else {
+  //   PIN_TMS_CLR();
+  // }
+
+  uint8_t tms = (info & JTAG_SEQUENCE_TMS)? 1: 0;
+
+  while (n) {
+    i_val = *tdi++;
+    o_val = 0U;
+    for (k = 8U; k && n; k--, n--) {
+      JTAG_CYCLE_TCK_FAST(tms, i_val, bit);
+      // JTAG_CYCLE_TDIO(i_val, bit);
+      i_val >>= 1;
+      o_val >>= 1;
+      o_val  |= bit << 7;
+    }
+    o_val >>= k;
+    if (info & JTAG_SEQUENCE_TDO) {
+      *tdo++ = (uint8_t)o_val;
+    }
+  }
+}
 // clang-format on
 
 // Configure DAP I/O pins ------------------------------

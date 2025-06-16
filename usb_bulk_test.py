@@ -1,7 +1,7 @@
 import usb.core
 import time
 # 查找设备（替换为实际 VID/PID）
-dev = usb.core.find(idVendor=0x0D28, idProduct=0x0201)
+dev = usb.core.find(idVendor=0x0D28, idProduct=0x0204)
 if dev is None:
     raise ValueError("设备未找到")
 else:
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     print(hex(dev.bcdUSB))  # U
     # for _ in range(10):
     while True:
-        ep_out.write(bytearray([0x7e, 1, 0x80]))
+        ep_out.write(bytearray([0x7e, 1, 0x80, 1]))
         # ep_out.write(bytearray([5,0x01,0x08,0x00,0xff]))
         # ep_out.write(bytearray([5,0x80,0x08,0x00,0xff]))
         # ep_out.write(bytearray([6,0x0,0x09,0x00,0x55,0x55]))

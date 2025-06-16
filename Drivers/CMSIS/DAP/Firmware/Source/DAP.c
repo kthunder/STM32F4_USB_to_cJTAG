@@ -29,6 +29,7 @@
 #include "DAP_config.h"
 #include "DAP.h"
 
+static uint8_t cJtag_enabled = 0;
 
 #if (DAP_PACKET_SIZE < 64U)
 #error "Minimum Packet Size is 64!"
@@ -442,7 +443,12 @@ static uint32_t DAP_SWJ_Sequence(const uint8_t *request, uint8_t *response) {
   }
 
 #if ((DAP_SWD != 0) || (DAP_JTAG != 0))
-  SWJ_Sequence(count, request);
+  if (cJtag_enabled) {
+extern void cJTAG_tms(uint32_t bits, uint8_t* ucTMS);
+    cJTAG_tms(count, (uint8_t*)request);
+  }else {
+    SWJ_Sequence(count, request);
+  }
   *response = DAP_OK;
 #else
   *response = DAP_ERROR;
@@ -560,6 +566,9 @@ static uint32_t DAP_JTAG_Sequence(const uint8_t *request, uint8_t *response) {
     }
     count = (count + 7U) / 8U;
 #if (DAP_JTAG != 0)
+  if (cJtag_enabled)
+    cJTAG_Sequence(sequence_info, request, response);
+  else
     JTAG_Sequence(sequence_info, request, response);
 #endif
     request += count;
@@ -1629,7 +1638,6 @@ __WEAK uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *respon
   *response = ID_DAP_Invalid;
   return ((1U << 16) | 1U);
 }
-
 
 // Process DAP command request and prepare response
 //   request:  pointer to request data
