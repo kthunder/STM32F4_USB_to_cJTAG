@@ -15,20 +15,6 @@
 #define PIN_TMSC_OUT_SIDE_SET(bit)  TMSC_GPIO_Port->BSRR = (TCKC_Pin<< 0)|(TMSC_Pin << (bit?0:16));__NOP();
 #define PIN_TMSC_OUT_SIDE_CLR(bit)  TMSC_GPIO_Port->BSRR = (TCKC_Pin<<16)|(TMSC_Pin << (bit?0:16));__NOP();
 // clang-format on
-char binary_string[64] = {0};
-char *to_binary_string(unsigned int value, uint32_t bits)
-{
-    uint32_t i = 0;
-    // 从最高位到最低位逐位检查并填充字符串
-    for (i = 0; i < bits; i++)
-    {
-        binary_string[i] = ((value >> i) & 1) ? '1' : '0';
-    }
-    // 添加字符串结束符
-    binary_string[i] = '\0';
-
-    return binary_string;
-}
 /*------------------------PIN OPERATION PORTING----------------------------------*/
 
 #define PIN_TCK_SET() PIN_TCK_OUT(1)

@@ -230,6 +230,9 @@
 #include <stdint.h>
 #include "cmsis_compiler.h"
 
+#include "main.h"
+#include "log.h"
+
 // DAP Data structure
 typedef struct {
   uint8_t     debug_port;                       // Debug Port

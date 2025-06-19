@@ -88,6 +88,20 @@ extern void usbd_winusb_write(uint8_t * buffer, uint32_t len);
 /* USER CODE BEGIN 0 */
 // ***用户***私有代码0
 // commom functions
+char *to_binary_string(unsigned int value, uint32_t bits)
+{
+    static char binary_string[64] = {0};
+    uint32_t i = 0;
+    // 从最高位到最低位逐位检查并填充字符串
+    for (i = 0; i < bits; i++)
+    {
+        binary_string[i] = ((value >> i) & 1) ? '1' : '0';
+    }
+    // 添加字符串结束符
+    binary_string[i] = '\0';
+
+    return binary_string;
+}
 int __io_getchar(FILE *file) {
   (void)file;
   return 0;
@@ -178,7 +192,7 @@ int main(void)
   // log_set_level(LOG_DEBUG);
   // winusb_init(0, (uintptr_t)USB_OTG_FS);
   chry_dap_init(0, (uintptr_t)USB_OTG_FS);
-  // cJtag_active(); 
+  // cJtag_active();
   // test();
   /* USER CODE END 2 */
 

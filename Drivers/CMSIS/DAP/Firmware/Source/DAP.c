@@ -29,7 +29,7 @@
 #include "DAP_config.h"
 #include "DAP.h"
 
-static uint8_t cJtag_enabled = 0;
+uint8_t cJtag_enabled = 0;
 
 #if (DAP_PACKET_SIZE < 64U)
 #error "Minimum Packet Size is 64!"

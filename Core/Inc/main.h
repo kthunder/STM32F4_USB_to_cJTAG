@@ -48,7 +48,7 @@ extern "C" {
 /* USER CODE BEGIN EM */
 #define ARRAY_GET_BIT(array, bit) ((((uint8_t *)array)[(bit) / 8] >> ((bit) % 8)) & 1)
 #define ARRAY_SET_BIT(array, bit, val) ((uint8_t *)array)[(bit) / 8] = ((array)[(bit) / 8] & ~(1 << ((bit) % 8))) | ((uint8_t)((val) & 1) << ((bit) % 8))
-
+extern char *to_binary_string(unsigned int value, uint32_t bits);
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

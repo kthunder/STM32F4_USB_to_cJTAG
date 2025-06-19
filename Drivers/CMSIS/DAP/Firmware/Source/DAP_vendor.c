@@ -52,11 +52,17 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
 
   switch (*request++) {          // first byte in request is Command ID
     case ID_DAP_Vendor0:
-#if 0                            // example user command
+#if 1                            // example user command
       num += 1U << 16;           // increment request count
       if (*request == 1U) {      // when first command data byte is 1
-        *response++ = 'X';       // send 'X' as response
-        num++;                   // increment response count
+        // *response++ = 'X';       // send 'X' as response
+        // num++;                   // increment response count
+extern void cJtag_active(void);
+extern uint8_t cJtag_enabled;
+        cJtag_enabled = 1;       // enable cJTAG
+        cJtag_active(); 
+        *response++ = DAP_OK;
+        num++;
       }
 #endif
       break;

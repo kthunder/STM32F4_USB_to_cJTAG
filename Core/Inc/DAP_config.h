@@ -369,7 +369,7 @@ __STATIC_INLINE void cJTAG_Sequence (uint32_t info, const uint8_t *tdi, uint8_t 
     i_val = *tdi++;
     o_val = 0U;
     for (k = 8U; k && n; k--, n--) {
-      JTAG_CYCLE_TCK_FAST(tms, i_val, bit);
+      JTAG_CYCLE_TCK_FAST(tms, (i_val&1), bit);
       // JTAG_CYCLE_TDIO(i_val, bit);
       i_val >>= 1;
       o_val >>= 1;
