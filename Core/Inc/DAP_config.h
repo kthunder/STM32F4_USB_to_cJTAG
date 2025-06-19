@@ -303,6 +303,9 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
  - \ref PIN_SWDIO_OUT to write to the SWDIO I/O pin with utmost possible speed.
 */
 // clang-format off
+#define PORT_PIN_SET(GPIOx, PINx, bit)  ((GPIOx)->BSRR = (PINx << (bit?0:16)))
+#define PORT_PIN_GET(GPIOx, PINx)       ((GPIOx->IDR & PINx)>0);
+
 #define PORT_PIN_SWCLK_OUT(bit)        TCKC_GPIO_Port->BSRR = (TCKC_Pin << (bit?0:16))
 #define PORT_PIN_SWDIO_OUT(bit)        TMSC_GPIO_Port->BSRR = (TMSC_Pin << (bit?0:16))
 #define PORT_PIN_SWCLK_IN()            ((TCKC_GPIO_Port->IDR & TCKC_Pin)>0)
@@ -338,49 +341,6 @@ of the same I/O port. The following SWDIO I/O Pin functions are provided:
         iPIN_TCK_CLR();                     \
         iPIN_TMS_INPUT_DISABLE();           \
     } while (0);
-
-
-// Generate cJTAG Sequence
-//   info:   sequence information
-//   tdi:    pointer to TDI generated data
-//   tdo:    pointer to TDO captured data
-//   return: none
-#include "DAP.h"
-__STATIC_INLINE void cJTAG_Sequence (uint32_t info, const uint8_t *tdi, uint8_t *tdo) {
-  uint32_t i_val;
-  uint32_t o_val;
-  uint32_t bit;
-  uint32_t n, k;
-
-  n = info & JTAG_SEQUENCE_TCK;
-  if (n == 0U) {
-    n = 64U;
-  }
-
-  // if (info & JTAG_SEQUENCE_TMS) {
-  //   PIN_TMS_SET();
-  // } else {
-  //   PIN_TMS_CLR();
-  // }
-
-  uint8_t tms = (info & JTAG_SEQUENCE_TMS)? 1: 0;
-
-  while (n) {
-    i_val = *tdi++;
-    o_val = 0U;
-    for (k = 8U; k && n; k--, n--) {
-      JTAG_CYCLE_TCK_FAST(tms, (i_val&1), bit);
-      // JTAG_CYCLE_TDIO(i_val, bit);
-      i_val >>= 1;
-      o_val >>= 1;
-      o_val  |= bit << 7;
-    }
-    o_val >>= k;
-    if (info & JTAG_SEQUENCE_TDO) {
-      *tdo++ = (uint8_t)o_val;
-    }
-  }
-}
 // clang-format on
 
 // Configure DAP I/O pins ------------------------------

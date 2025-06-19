@@ -159,6 +159,15 @@ void cJTAG_tms(uint32_t bits, uint8_t* ucTMS)
     (void)tdo;
 }
 
+void cJtag_active(void)
+{
+    JTAG_sequence_escape(10);
+    JTAG_sequence_tms(0xFFFF, 24);
+    JTAG_sequence_escape(7);
+    JTAG_sequence_tms(0x08C, 12);
+}
+
+#if 0
 void cJTAG_operation_ir_scan(uint8_t *ir_w, uint8_t *ir_r, uint32_t bits)
 {
     if (ir_w == NULL || bits == 0 || bits > 8)
@@ -198,14 +207,6 @@ void cJTAG_operation_dr_scan(uint8_t *dr_w, uint8_t *dr_r, uint32_t bits)
     cJTAG_tms(2, (uint8_t *)&TMS); // to Run-Test/Idle
 }
 
-void cJtag_active()
-{
-    JTAG_sequence_escape(10);
-    JTAG_sequence_tms(0xFFFF, 24);
-    JTAG_sequence_escape(7);
-    JTAG_sequence_tms(0x08C, 12);
-}
-
 int test(void)
 {
     uint32_t ir_w = 0x01;
@@ -221,3 +222,4 @@ int test(void)
 
     return 1;
 }
+#endif

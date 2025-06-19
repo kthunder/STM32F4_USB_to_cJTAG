@@ -75,8 +75,8 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 // ***用户***私有函数签名
-extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
-                           uint32_t bits);
+// extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
+//                            uint32_t bits);
 extern void cJtag_active(void);
 extern void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO);
 extern void cJTAG_tms(uint32_t bits, uint8_t* ucTMS);

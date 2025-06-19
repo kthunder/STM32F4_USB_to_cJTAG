@@ -48,7 +48,7 @@ This information includes:
 #include "RTE_Components.h"
 #include CMSIS_device_header
 #else
-#include "device.h"                             // Debug Unit Cortex-M Processor Header File
+#include "main.h"                             // Debug Unit Cortex-M Processor Header File
 #endif
 
 /// Processor Clock of the Cortex-M MCU used in the Debug Unit.

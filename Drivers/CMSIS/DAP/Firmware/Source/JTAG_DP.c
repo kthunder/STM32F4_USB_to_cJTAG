@@ -108,6 +108,46 @@ void JTAG_Sequence (uint32_t info, const uint8_t *tdi, uint8_t *tdo) {
   }
 }
 
+// Generate cJTAG Sequence
+//   info:   sequence information
+//   tdi:    pointer to TDI generated data
+//   tdo:    pointer to TDO captured data
+//   return: none
+void cJTAG_Sequence (uint32_t info, const uint8_t *tdi, uint8_t *tdo) {
+  uint32_t i_val;
+  uint32_t o_val;
+  uint32_t bit;
+  uint32_t n, k;
+
+  n = info & JTAG_SEQUENCE_TCK;
+  if (n == 0U) {
+    n = 64U;
+  }
+
+  // if (info & JTAG_SEQUENCE_TMS) {
+  //   PIN_TMS_SET();
+  // } else {
+  //   PIN_TMS_CLR();
+  // }
+
+  uint8_t tms = (info & JTAG_SEQUENCE_TMS)? 1: 0;
+
+  while (n) {
+    i_val = *tdi++;
+    o_val = 0U;
+    for (k = 8U; k && n; k--, n--) {
+      JTAG_CYCLE_TCK_FAST(tms, (i_val&1), bit);
+      // JTAG_CYCLE_TDIO(i_val, bit);
+      i_val >>= 1;
+      o_val >>= 1;
+      o_val  |= bit << 7;
+    }
+    o_val >>= k;
+    if (info & JTAG_SEQUENCE_TDO) {
+      *tdo++ = (uint8_t)o_val;
+    }
+  }
+}
 
 // JTAG Set IR
 //   ir:     IR value
