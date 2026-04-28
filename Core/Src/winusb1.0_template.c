@@ -5,7 +5,6 @@
  */
 #include "usbd_core.h"
 #include "usbd_cdc_acm.h"
-#include "chry_ringbuffer.h"
 
 #define WCID_VENDOR_CODE 0x17
 
@@ -165,10 +164,10 @@ struct usb_msosv1_descriptor msosv1_desc = {
 };
 
 #define WINUSB_IN_EP  0x81
-#define WINUSB_OUT_EP 0x01
+#define WINUSB_OUT_EP 0x02
 
-#define USBD_VID           0x1D50
-#define USBD_PID           0x60AC
+#define USBD_VID           0xefff
+#define USBD_PID           0xffff
 #define USBD_MAX_POWER     100
 #define USBD_LANGID_STRING 1033
 
@@ -442,30 +441,53 @@ static void usbd_event_handler(uint8_t busid, uint8_t event)
             break;
     }
 }
-
-extern chry_ringbuffer_t rb;
+typedef struct
+{
+    uint8_t header;
+    uint8_t addr : 7;
+    uint8_t is_read : 1;
+    uint8_t data_len : 7;
+    uint8_t is_continue : 1;
+    uint8_t data[0];
+} i2c_cmdx;
 
 void usbd_winusb_out(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
-    USB_LOG_RAW("actual out len:%d\r\n", (unsigned int)nbytes);
-    // for (int i = 0; i < 100; i++) {
-    //     printf("%c ", read_buffer[i]);
+    // USB_LOG_RAW("actual out len:%d\r\n", (unsigned int)nbytes);
+    // for (int i = 0; i < nbytes; i++) {
+    //     printf("%02x ", read_buffer[i]);
     // }
-    printf("--------------%s\r\n", __func__);
-    chry_ringbuffer_write(&rb, read_buffer, nbytes);
-    /* setup next out ep read transfer */
-    usbd_ep_start_read(busid, WINUSB_OUT_EP, read_buffer, 64);
-}
+    i2c_cmdx * msg = (i2c_cmdx *)read_buffer;
+    printf("%s %d bytes\r\n", msg->is_read ? "read" : "write", msg->data_len);
+    
+    if (msg->is_read)
+    {
+        read_buffer[0] = 'A';
+        // for (uint32_t i = 0; i < msg->data_len; i++) {
+        //     read_buffer[i+1] = rand() & 0xff;
+        // }
+    }
+    else
+    {
+        read_buffer[0] = 'B';
+    }
 
-void usbd_winusb_write(uint8_t * buffer, uint32_t len)
-{
-    usbd_ep_start_write(0, WINUSB_IN_EP, buffer, len);
+    if (msg->is_read)
+    {
+        usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, 1+msg->data_len);
+    }
+    else
+    {
+        usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, 1);
+    }
+    // usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, nbytes);
+    /* setup next out ep read transfer */
+    usbd_ep_start_read(busid, WINUSB_OUT_EP, read_buffer, 2048);
 }
 
 void usbd_winusb_in(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
-    USB_LOG_RAW("actual in len:%d\r\n", (unsigned int)nbytes);
-    printf("--------------%s\r\n", __func__);
+    // USB_LOG_RAW("actual in len:%d\r\n", (unsigned int)nbytes);
 
     if ((nbytes % WINUSB_EP_MPS) == 0 && nbytes) {
         /* send zlp */

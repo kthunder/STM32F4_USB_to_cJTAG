@@ -191,7 +191,9 @@ int main(void)
   // ***用户***私有代码2
   // log_set_level(LOG_DEBUG);
   // winusb_init(0, (uintptr_t)USB_OTG_FS);
-  chry_dap_init(0, (uintptr_t)USB_OTG_FS);
+  // chry_dap_init(0, (uintptr_t)USB_OTG_FS);
+  extern void winusb_init(uint8_t busid, uintptr_t reg_base);
+  winusb_init(0, (uintptr_t)USB_OTG_FS);
   // cJtag_active();
   // test();
   /* USER CODE END 2 */
@@ -210,8 +212,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     // ***用户***私有代码3
-    chry_dap_handle();
-    chry_dap_usb2uart_handle();
+    // chry_dap_handle();
+    // chry_dap_usb2uart_handle();
   }
   /* USER CODE END 3 */
 }

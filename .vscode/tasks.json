@@ -6,7 +6,7 @@
         {
             "type": "shell",
             "label": "Download",
-            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c 'cmsis_dap_serial 070000011a5a5bb6000000000009db09a5a5a5a597969908' -c'program ./build/Debug/cw2225_tool.elf verify reset exit' ",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c'program ./build/cw2225_tool.elf verify reset exit' ",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -16,7 +16,7 @@
         {
             "type": "shell",
             "label": "Build",
-            "command": "cmake.exe --build ./build/Debug --target all --",
+            "command": "cmake -S . -B build -G Ninja;cmake --build build -j12",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
