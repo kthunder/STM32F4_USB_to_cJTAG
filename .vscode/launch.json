@@ -7,7 +7,7 @@
         {
             "name": "launch",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/Debug/${workspaceFolderBasename}.elf",
+            "executable": "./build/${workspaceFolderBasename}.elf",
             "request": "launch",
             "type": "cortex-debug",
             "runToEntryPoint": "main",
@@ -42,12 +42,13 @@
         {
             "name": "attach",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/Debug/${workspaceFolderBasename}.elf",
+            "executable": "./build/${workspaceFolderBasename}.elf",
             "request": "attach",
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "servertype": "openocd",
             "gdbPath": "arm-none-eabi-gdb.exe",
+            "svdFile": "./.vscode/STM32F401.svd",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
                 // "interface/stlink-v2-1.cfg",

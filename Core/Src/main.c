@@ -26,7 +26,7 @@
 #include <stdbool.h>
 #include "log.h"
 #include "chry_ringbuffer.h"
-// #include "winusb.h"
+#include "winusb.h"
 #include "dap_main.h"
 /* USER CODE END Includes */
 
@@ -55,6 +55,8 @@ typedef struct
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
 UART_HandleTypeDef huart1;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
@@ -73,6 +75,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 // ***用户***私有函数签名
 // extern void cJTAG_sequence(uint8_t *ucTMS, uint8_t *ucTDI, uint8_t *ucTDO,
@@ -81,7 +84,6 @@ extern void cJtag_active(void);
 extern void cJTAG_seq(uint32_t bits, uint8_t *ucTDI, uint8_t *ucTDO);
 extern void cJTAG_tms(uint32_t bits, uint8_t* ucTMS);
 extern int test(void);
-extern void usbd_winusb_write(uint8_t * buffer, uint32_t len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -151,6 +153,73 @@ void cJtag_task(void) {
     }
   }
 }
+typedef struct
+{
+  uint8_t len;
+  uint8_t opcode;
+  uint8_t data[];
+} common_msg;
+
+typedef struct
+{
+    uint8_t len;
+    uint8_t opcode;
+    uint8_t addr : 7;
+    uint8_t is_read : 1;
+    uint8_t data_len : 7;
+    uint8_t is_continue : 1;
+    uint8_t data[];
+} i2c_cmdx;
+
+chry_ringbuffer_t msg_rb;
+static uint8_t mem_pool[1024];
+static uint8_t msg_buff[64] = {0};
+static common_msg *curr_msg = (common_msg *)msg_buff;
+static i2c_cmdx *curr_i2c_cmd = (i2c_cmdx *)msg_buff;
+uint8_t i2c_rx_buff[0x100] = {0};
+
+void common_msg_buffer_push(uint8_t *data, uint8_t len)
+{
+    chry_ringbuffer_write(&msg_rb, data, len);
+}
+
+void common_msg_handler(void) {
+  if (chry_ringbuffer_peek_byte(&msg_rb, msg_buff)) {
+    if (msg_buff[0] <= chry_ringbuffer_get_used(&msg_rb)) {
+      chry_ringbuffer_read(&msg_rb, msg_buff, msg_buff[0]);
+      LED_TogglePin();
+      // recive a cmd
+      // log_info("--cmd %d---", count++);
+      // log_info("cmd[%02X]bits[%d]", curr_msg->opcode, curr_msg->bits);
+
+      switch (curr_msg->opcode) {
+      case 0: // i2c cmd
+      {
+        if (curr_i2c_cmd->is_read) {
+            // read
+            HAL_I2C_Master_Receive(&hi2c1, curr_i2c_cmd->addr<<1,
+              (uint8_t *)&i2c_rx_buff+1, curr_i2c_cmd->data_len, 0x1000);
+            i2c_rx_buff[0] = 0xAA;
+            log_hex("read data", i2c_rx_buff+1, curr_i2c_cmd->data_len);
+            usbd_winusb_write(i2c_rx_buff, curr_i2c_cmd->data_len+1);
+            // printf("read len %d\r\n", curr_i2c_cmd->data_len);   
+        }
+        else {
+            // write
+            HAL_I2C_Master_Transmit(&hi2c1, curr_i2c_cmd->addr<<1,
+              (uint8_t *)&curr_i2c_cmd->data[0], curr_i2c_cmd->data_len, 0x1000);
+            i2c_rx_buff[0] = 0xBB;
+            usbd_winusb_write(i2c_rx_buff, 1);
+            // printf("write len %d\r\n", curr_i2c_cmd->data_len);   
+        }
+        break;
+      } 
+      default:
+        break;
+      }
+    }
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -173,6 +242,7 @@ int main(void)
   /* USER CODE BEGIN Init */
   // ***用户***初始化
   // chry_ringbuffer_init(&rb, mempool, 1024);
+  chry_ringbuffer_init(&msg_rb, mem_pool, sizeof(mem_pool));
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -185,8 +255,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  //MX_USB_OTG_FS_PCD_Init();
+  // MX_USB_OTG_FS_PCD_Init();
   MX_USART1_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   // ***用户***私有代码2
   // log_set_level(LOG_DEBUG);
@@ -202,6 +273,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) {
     // ***用户***循环代码
+    common_msg_handler();
     // cJtag_task();
     // static uint32_t tick = 0;
     // if ((HAL_GetTick() - tick)>2000) {
@@ -261,6 +333,40 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
 }
 
 /**
@@ -346,6 +452,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);

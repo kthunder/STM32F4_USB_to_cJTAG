@@ -32,36 +32,35 @@ def speed_test():
     duration = time.time() - start
     print(f"速度: {bytelen / duration / 1024:.2f} KB/s")
 
-
+# typedef struct
+# {
+#     uint8_t len;
+#     uint8_t opcode;
+#     uint8_t addr : 7;
+#     uint8_t is_read : 1;
+#     uint8_t data_len : 7;
+#     uint8_t is_continue : 1;
+#     uint8_t data[];
+# } i2c_cmdx;
 if __name__ == "__main__":
     # print(usb.util.get_string(dev, dev.iProduct))  # 产品名称
     # print(hex(dev.bcdUSB))  # U
     # for _ in range(10):
     while True:
-        ep_out.write(bytearray([0x7e, 0x8F, 0x02, 1]))
+        ep_out.write(bytearray([5,0x00,0x08,0x01,0xff]))
+        data = ep_in.read(1, timeout=1000)
+        print("接收数据:", [hex(x) for x in data])
+
+        # ep_out.write(bytearray([0x7e, 0x0F, 0x01]))
         # ep_out.write(bytearray([5,0x01,0x08,0x00,0xff]))
         # ep_out.write(bytearray([5,0x80,0x08,0x00,0xff]))
         # ep_out.write(bytearray([6,0x0,0x09,0x00,0x55,0x55]))
         # ep_out.write(bytearray([6,0x1,0x0A,0x00,0xAA,0xAA]))
-        time.sleep(1)
-        try:
-            data = ep_in.read(10, timeout=1000)
-            print("接收数据:", [hex(x) for x in data])
-        except usb.core.USBError as e:
-            print(f"USB错误: {e}")
-        # finally:
-        #     time.sleep(1)
-        ep_out.write(bytearray([0x7e, 0x0F, 0x01]))
-        time.sleep(1)
-        # ep_out.write(bytearray([5,0x01,0x08,0x00,0xff]))
-        # ep_out.write(bytearray([5,0x80,0x08,0x00,0xff]))
-        # ep_out.write(bytearray([6,0x0,0x09,0x00,0x55,0x55]))
-        # ep_out.write(bytearray([6,0x1,0x0A,0x00,0xAA,0xAA]))
-        try:
-            data = ep_in.read(10, timeout=1000)
-            print("接收数据:", [hex(x) for x in data])
-        except usb.core.USBError as e:
-            print(f"USB错误: {e}")
+        # try:
+        #     data = ep_in.read(10, timeout=1000)
+        #     print("接收数据:", [hex(x) for x in data])
+        # except usb.core.USBError as e:
+        #     print(f"USB错误: {e}")
         # finally:
         #     time.sleep(1)
         break

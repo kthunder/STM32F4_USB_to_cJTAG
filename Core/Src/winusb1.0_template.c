@@ -453,36 +453,16 @@ typedef struct
 
 void usbd_winusb_out(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
-    // USB_LOG_RAW("actual out len:%d\r\n", (unsigned int)nbytes);
-    // for (int i = 0; i < nbytes; i++) {
-    //     printf("%02x ", read_buffer[i]);
-    // }
-    i2c_cmdx * msg = (i2c_cmdx *)read_buffer;
-    printf("%s %d bytes\r\n", msg->is_read ? "read" : "write", msg->data_len);
-    
-    if (msg->is_read)
-    {
-        read_buffer[0] = 'A';
-        // for (uint32_t i = 0; i < msg->data_len; i++) {
-        //     read_buffer[i+1] = rand() & 0xff;
-        // }
-    }
-    else
-    {
-        read_buffer[0] = 'B';
-    }
-
-    if (msg->is_read)
-    {
-        usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, 1+msg->data_len);
-    }
-    else
-    {
-        usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, 1);
-    }
+    extern void common_msg_buffer_push(uint8_t *data, uint8_t len);
+    common_msg_buffer_push(read_buffer, nbytes);
     // usbd_ep_start_write(busid, WINUSB_IN_EP, read_buffer, nbytes);
     /* setup next out ep read transfer */
     usbd_ep_start_read(busid, WINUSB_OUT_EP, read_buffer, 2048);
+}
+
+void usbd_winusb_write(uint8_t * buffer, uint32_t len)
+{
+    usbd_ep_start_write(0, WINUSB_IN_EP, buffer, len);
 }
 
 void usbd_winusb_in(uint8_t busid, uint8_t ep, uint32_t nbytes)
