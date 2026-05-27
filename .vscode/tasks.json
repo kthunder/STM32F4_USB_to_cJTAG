@@ -6,7 +6,7 @@
         {
             "type": "shell",
             "label": "Download",
-            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c'program ./build/cw2225_tool.elf verify reset exit' ",
+            "command": "openocd -f interface/cmsis-dap.cfg -f target/stm32f4x.cfg -c'program ./build/\"${workspaceFolderBasename}\".elf verify reset exit' ",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
