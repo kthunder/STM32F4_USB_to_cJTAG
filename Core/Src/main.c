@@ -230,7 +230,6 @@ void common_msg_handler(void) {
     }
   }
 }
-
 /* USER CODE END 0 */
 
 /**
@@ -531,11 +530,11 @@ void StartDefaultTask(void *argument)
   {
     // common_msg_handler();
     // cJtag_task();
-    // static uint32_t tick = 0;
-    // if ((HAL_GetTick() - tick)>2000) {
-    //   LED_TogglePin();
-    //   tick = HAL_GetTick();
-    // }
+    static uint32_t tick = 0;
+    if ((HAL_GetTick() - tick)>2000) {
+      LED_TogglePin();
+      tick = HAL_GetTick();
+    }
 
     // chry_dap_handle();
     // chry_dap_usb2uart_handle();
