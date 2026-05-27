@@ -17,7 +17,7 @@
         "-j=12",
         "--background-index",
         "--query-driver=C:/APP/xpack-dev-tools/arm-none-eabi-gcc/bin/arm-none-eabi-*", //设置交叉编译器路径
-        "--compile-commands-dir=${workspaceFolder}/build/Debug",
+        "--compile-commands-dir=${workspaceFolder}/build",
         "--all-scopes-completion",
         "--completion-style=detailed",
         "--header-insertion=never",

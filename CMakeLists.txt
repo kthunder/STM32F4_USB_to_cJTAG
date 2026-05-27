@@ -40,12 +40,14 @@ enable_language(C ASM)
 add_executable(${CMAKE_PROJECT_NAME})
 
 add_compile_definitions(STM32F401xC)
+add_compile_definitions(CONFIG_ESP_SPI_HOST_INTERFACE)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 add_subdirectory(cmake/app)
 add_subdirectory(cmake/CherryUSB)
 add_subdirectory(cmake/CherryDAP)
+add_subdirectory(cmake/esp_hosted)
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -74,5 +76,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     app
     CherryUSB
     CherryDAP
+    esp_hosted_lib
     # Add user defined libraries
 )
